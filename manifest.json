@@ -9,12 +9,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/Diary192x192.png",
+      "src": "https://i.imgur.com/lvvl1qW.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/Diary192x192.png",
+      "src": "https://i.imgur.com/e6KxRxy.png",
       "sizes": "512x512",
       "type": "image/png"
     }
