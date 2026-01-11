@@ -585,6 +585,7 @@ export const Settings: React.FC = () => {
                       <li>Use o <strong>Diário</strong> para registrar presenças e faltas.</li>
                       <li>Acompanhe seu desempenho e notas em <strong>Notas</strong> e <strong>Análise</strong>.</li>
                       <li>Gerencie seus trabalhos e provas em <strong>Tarefas</strong>.</li>
+                      <li>Por enquanto o Diary não suporta salvamentos na nuvem, então seus dados atuais só são acessíveis <strong>neste dispositivo</strong>, mas, se quiser acessá-los em outros, exporte manualmente o .json na aba <strong>Dados</strong>.</li>
                   </ul>
               </div>
 
