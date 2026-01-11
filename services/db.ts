@@ -86,7 +86,7 @@ export const DBService = {
           */
           
           console.log(`[Mock Upload] Uploading ${JSON.stringify(data).length} bytes to ${serverUrl}...`);
-          await new Promise(r => setTimeout(r, 1500)); // Simulate latency
+          await new Promise(r => setTimeout(r, 1500));
           
           return true;
       } catch (e) {

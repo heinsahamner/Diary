@@ -10,7 +10,7 @@ export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'preferences' | 'academic' | 'data' | 'subjects' | 'schedule' | 'about'>('preferences');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [serverUrl, setServerUrl] = useState('https://api.myserver.com/backup');
+  const [serverUrl, setServerUrl] = useState('https://nao-tem-backup-ainda.sorry');
   const [isUploading, setIsUploading] = useState(false);
 
   const [editingSubjectId, setEditingSubjectId] = useState<string | null>(null);

@@ -158,17 +158,17 @@ export const Tasks: React.FC = () => {
                 onChange={e => setNewTaskDate(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
                <input 
                 type="text" 
                 placeholder="Integrantes (Opcional, separada por vírgula)"
-                className="flex-grow p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm border-transparent focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-purple-500 outline-none dark:text-white"
+                className="w-full md:flex-grow p-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm border-transparent focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-purple-500 outline-none dark:text-white"
                 value={newTaskMembers}
                 onChange={e => setNewTaskMembers(e.target.value)}
             />
             <button 
                 type="submit"
-                className="bg-indigo-600 dark:bg-purple-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-purple-700 transition-colors"
+                className="w-full md:w-auto bg-indigo-600 dark:bg-purple-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 dark:hover:bg-purple-700 transition-colors"
             >
                 Adicionar
             </button>
