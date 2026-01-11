@@ -146,10 +146,10 @@ export const Settings: React.FC = () => {
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Configurações</h1>
       
       <div className="flex space-x-4 mb-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto no-scrollbar">
-          {/* Tabs */}
+          {/* Abas */}
           {[
               { id: 'preferences', label: 'Preferências' },
-              { id: 'academic', label: 'Acadêmico' },
+              { id: 'academic', label: 'Definições' },
               { id: 'subjects', label: 'Matérias' },
               { id: 'schedule', label: 'Grade' },
               { id: 'data', label: 'Dados' },
@@ -284,7 +284,7 @@ export const Settings: React.FC = () => {
 
       {activeTab === 'data' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Local File Management */}
+              {/* Gerenciamento de arquivos locais */}
               <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-6 h-fit">
                 <h3 className="font-bold text-gray-700 dark:text-gray-200">Arquivo Local (Manual)</h3>
                 
@@ -314,7 +314,7 @@ export const Settings: React.FC = () => {
                 </p>
              </div>
 
-             {/* Cloud Backup (Simulated) */}
+             {/* Backup na nuvem (simulado) */}
              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-6 h-fit">
                 <div className="flex items-center gap-2 text-indigo-600 dark:text-purple-400">
                     <Upload size={24} />
@@ -351,10 +351,10 @@ export const Settings: React.FC = () => {
 
       {activeTab === 'subjects' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* List */}
+              {/* Lista */}
               <div className="space-y-3">
                   <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-2">Matérias Atuais ({settings.currentYear})</h3>
-                  {subjects.map(s => (
+                  {subjects.filter(s => s.id !== 'vago').map(s => (
                       <div key={s.id} className={`flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border transition-all ${editingSubjectId === s.id ? 'border-indigo-500 ring-1 ring-indigo-200 dark:border-purple-500' : 'border-gray-200 dark:border-gray-700'}`}>
                           <div className="flex items-center space-x-3">
                               <div className="w-6 h-6 rounded-full" style={{ backgroundColor: s.color }} />
@@ -376,7 +376,7 @@ export const Settings: React.FC = () => {
                   {subjects.length === 0 && <p className="text-sm text-gray-400 italic">Nenhuma matéria cadastrada para este ano.</p>}
               </div>
 
-              {/* Add/Edit Form */}
+              {/* Adicionar/Editar */}
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 h-fit">
                   <div className="flex justify-between items-center mb-4">
                       <h3 className="font-bold text-gray-700 dark:text-gray-200">{editingSubjectId ? 'Editar Matéria' : 'Adicionar Matéria'}</h3>
@@ -462,7 +462,7 @@ export const Settings: React.FC = () => {
 
       {activeTab === 'schedule' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Add Slot Form */}
+              {/* Slot de Adicionar */}
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 h-fit">
                   <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-4">Adicionar Aula</h3>
                   <form onSubmit={handleAddSlot} className="space-y-4">
@@ -518,7 +518,7 @@ export const Settings: React.FC = () => {
                   </form>
               </div>
 
-              {/* Schedule List/Preview */}
+              {/* Lista/preview da Grade */}
               <div className="lg:col-span-2 space-y-6">
                  {DAYS_OF_WEEK.map((dayName, index) => {
                      const daySlots = schedule.filter(s => s.dayOfWeek === index).sort((a,b) => a.startTime.localeCompare(b.startTime));

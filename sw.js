@@ -1,21 +1,24 @@
-const CACHE_NAME = 'diary-student-planner-v1';
+const CACHE_NAME = 'diary';
 
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  'https://cdn.tailwindcss.com',
+  'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_URLS);
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
+  self.clients.claim();
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -27,51 +30,57 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  const url = new URL(request.url);
 
-  if (event.request.method !== 'GET') return;
-
-  const url = new URL(event.request.url);
-  
-  const isExternal = url.hostname.includes('esm.sh') || 
-                     url.hostname.includes('cdn.tailwindcss.com') || 
-                     url.hostname.includes('fonts.googleapis.com') ||
-                     url.hostname.includes('gstatic.com');
-
-  if (isExternal) {
+  if (request.mode === 'navigate') {
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
+      fetch(request)
+        .then((response) => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+          return response;
+        })
+        .catch(() => {
+          return caches.match('/index.html');
+        })
+    );
+    return;
+  }
+
+  const isStaticAsset = 
+    url.hostname.includes('esm.sh') ||
+    url.hostname.includes('tailwindcss.com') ||
+    url.hostname.includes('googleapis.com') || 
+    url.hostname.includes('gstatic.com') || 
+    url.hostname.includes('flaticon.com') ||
+    request.destination === 'script' ||
+    request.destination === 'style' ||
+    request.destination === 'image' ||
+    request.destination === 'font' ||
+    url.pathname.endsWith('.json');
+
+  if (isStaticAsset) {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
         if (cachedResponse) {
           return cachedResponse;
         }
-        return fetch(event.request).then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' && networkResponse.type !== 'cors') {
+        return fetch(request).then((networkResponse) => {
+          if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
             return networkResponse;
           }
           const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
           return networkResponse;
         });
       })
     );
-  } else {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-          return networkResponse;
-        })
-        .catch(() => {
-          return caches.match(event.request);
-        })
-    );
+    return;
   }
+
+  event.respondWith(fetch(request));
 });

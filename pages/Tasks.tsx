@@ -125,7 +125,7 @@ export const Tasks: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Tarefas e Entregas</h1>
       </div>
 
-      {/* Quick Add Bar */}
+      {/* Botão de adicionar rapidamente */}
       <form onSubmit={handleAddTask} className="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col gap-3">
           <div className="flex flex-col md:flex-row gap-3">
             <input 
@@ -175,9 +175,9 @@ export const Tasks: React.FC = () => {
           </div>
       </form>
 
-      {/* Columns Grid */}
+      {/* Grade das colunas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Late Column */}
+          {/* Última Coluna */}
           <div className="space-y-4">
               <div className="flex items-center gap-2 text-red-600 dark:text-red-400 font-bold border-b border-red-100 dark:border-red-900/50 pb-2">
                   <AlertCircle size={20} />
@@ -190,7 +190,7 @@ export const Tasks: React.FC = () => {
               </div>
           </div>
 
-          {/* This Week Column */}
+          {/* Coluna da semana atual */}
           <div className="space-y-4">
                <div className="flex items-center gap-2 text-indigo-600 dark:text-purple-400 font-bold border-b border-indigo-100 dark:border-purple-900/50 pb-2">
                   <Calendar size={20} />
@@ -203,7 +203,7 @@ export const Tasks: React.FC = () => {
               </div>
           </div>
 
-           {/* Upcoming Column */}
+           {/* Coluna do que virá */}
            <div className="space-y-4">
                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 font-bold border-b border-gray-100 dark:border-gray-700 pb-2">
                   <Clock size={20} />

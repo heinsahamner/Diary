@@ -169,10 +169,10 @@ export const Grades: React.FC = () => {
 
         {subjects.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Col: Entry Form & Trimester Select */}
+            {/* Coluna Esquerda: input e seleção do trimestre */}
             <div className="lg:col-span-2 space-y-6">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-                {/* Trimester Tabs */}
+                {/* Abas dos trimestres */}
                 <div className="flex space-x-4 border-b border-gray-100 dark:border-gray-700 pb-4 mb-4 overflow-x-auto">
                     {TRIMESTERS.map(t => (
                         <button
@@ -189,7 +189,7 @@ export const Grades: React.FC = () => {
                     ))}
                 </div>
 
-                {/* List */}
+                {/* Lista */}
                 <div className="space-y-3 mb-6">
                     {subjectAssessments.length === 0 ? (
                         <p className="text-center text-gray-400 text-sm py-4">Nenhuma nota lançada neste período.</p>
@@ -219,7 +219,7 @@ export const Grades: React.FC = () => {
                     )}
                 </div>
 
-                {/* Add Form */}
+                {/* Adicionar */}
                 <form onSubmit={handleAdd} className="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <input 
                         type="text" 
@@ -244,7 +244,7 @@ export const Grades: React.FC = () => {
                             <span className="absolute right-1 top-2 text-[10px] text-gray-400 pointer-events-none">0-10</span>
                         </div>
                          
-                         {/* Only show weight if Average system and NOT Extra point */}
+                         {/* Mostrar peso apenas se for média e não forem pontos extras */}
                          {settings.gradingSystem === 'average' && !isExtra && (
                              <div className="relative">
                                 <input 
@@ -276,7 +276,7 @@ export const Grades: React.FC = () => {
             </div>
             </div>
 
-            {/* Right Col: Summary */}
+            {/* Coluna Direita: Visão Geral */}
             <div className="space-y-6">
             <div className="bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-purple-700 dark:to-indigo-900 p-6 rounded-2xl text-white shadow-lg">
                     <h3 className="text-indigo-100 text-sm font-medium mb-1">Média {selectedTrimester}º Trimestre</h3>
@@ -287,7 +287,7 @@ export const Grades: React.FC = () => {
                     </div>
             </div>
             
-            {/* Simulator Widget */}
+            {/* Widget de Simulação das notas */}
             {neededScore && (
                  <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-2xl border border-orange-100 dark:border-orange-900/50">
                     <div className="flex items-center gap-2 text-orange-700 dark:text-orange-400 mb-2">

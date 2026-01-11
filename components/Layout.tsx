@@ -38,7 +38,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-200">
-      {/* Sidebar (Desktop) */}
+      {/* Barra Lateral (Desktop) */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-full p-4 shadow-sm z-10 print:hidden">
         <div className="flex items-center space-x-3 mb-8 px-2">
           <div className="w-8 h-8 bg-indigo-600 dark:bg-purple-600 rounded-lg flex items-center justify-center transition-colors">
@@ -57,14 +57,14 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
         </nav>
       </aside>
 
-      {/* Main Content */}
+      {/* Conteúdo Principal */}
       <main className="flex-1 overflow-y-auto pb-24 md:pb-0 relative bg-gray-50 dark:bg-gray-900">
         <div className="max-w-5xl mx-auto p-4 md:p-8">
             {children}
         </div>
       </main>
 
-      {/* Mobile Menu Overlay & Popup */}
+      {/* Menu Mobile */}
       {isMoreMenuOpen && (
         <>
             <div 
@@ -82,7 +82,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
         </>
       )}
 
-      {/* Bottom Nav (Mobile) */}
+      {/* Nav Inferior (Mobile) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 print:hidden safe-area-bottom">
         <NavItem to="/" icon={<LayoutDashboard size={22} />} label="Início" />
         <NavItem to="/diary" icon={<BookOpen size={22} />} label="Diário" />

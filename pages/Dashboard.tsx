@@ -44,7 +44,7 @@ export const Dashboard: React.FC = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Status Widget */}
+        {/* Widget de Status */}
         <div className={`p-5 rounded-2xl border ${isDayValidated ? 'bg-green-50 border-green-100' : 'bg-orange-50 border-orange-100'}`}>
           <div className="flex justify-between items-start">
             <div>
@@ -64,7 +64,7 @@ export const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Next Class Widget */}
+        {/* Widget de Próxima aula */}
         <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm">
            <div className="flex justify-between items-start">
             <div>
@@ -80,7 +80,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-         {/* Tasks Snapshot */}
+         {/* Prévia das Tarefas */}
          <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm">
            <div className="flex justify-between items-start">
             <div>
@@ -96,7 +96,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Urgent Tasks List */}
+      {/* Lista de tarefas urgentes */}
       <section className="mt-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Tarefas Urgentes</h2>
         {urgentTasks.length === 0 ? (

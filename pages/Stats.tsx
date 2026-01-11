@@ -206,9 +206,9 @@ export const Stats: React.FC = () => {
           </div>
       </div>
 
-      {/* Row 1: Global Pie + Profile */}
+      {/* Linha 1: Gráfico de pizza global + Perfil */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Global Frequency Donut */}
+          {/* "Rosca" da Presença Global (Rosca kkkk) */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center">
               <h3 className="text-lg font-bold text-gray-700 dark:text-white mb-2">Frequência Global</h3>
               <p className="text-xs text-gray-400 mb-4">Baseada em {settings.totalSchoolDays} dias letivos</p>
@@ -243,7 +243,7 @@ export const Stats: React.FC = () => {
               </div>
           </div>
 
-          {/* Student Profile & Radar */}
+          {/* Perfil */}
           <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col md:flex-row">
              <div className="flex-1">
                  <div className="flex items-center gap-3 mb-4">
@@ -287,9 +287,9 @@ export const Stats: React.FC = () => {
           </div>
       </div>
 
-      {/* Row 2: Charts */}
+      {/* Linha 2: Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Scatter Plot - Risk Matrix */}
+          {/* Matriz de Risco (que nome chique) */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
                <h3 className="text-lg font-bold text-gray-700 dark:text-white mb-2">Matriz de Risco</h3>
                <p className="text-xs text-gray-400 mb-6">Comparativo Nota vs. Frequência. Área inferior esquerda é crítica.</p>
@@ -301,7 +301,7 @@ export const Stats: React.FC = () => {
                       <ZAxis type="number" dataKey="z" range={[60, 400]} />
                       <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                       
-                      {/* Danger Zones */}
+                      {/* Zonas de perigo */}
                       <ReferenceLine x={75} stroke="red" strokeDasharray="3 3" label={{ value: 'Freq. Mín', position: 'insideTopLeft', fontSize: 10, fill: 'red' }} />
                       <ReferenceLine y={settings.passingGrade} stroke="blue" strokeDasharray="3 3" label={{ value: 'Média Azul', position: 'insideBottomRight', fontSize: 10, fill: 'blue' }} />
                       
@@ -315,7 +315,7 @@ export const Stats: React.FC = () => {
                </div>
           </div>
 
-          {/* Simple Bar Chart */}
+          {/* Gráfico simples de barra */}
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-bold text-gray-700 dark:text-white mb-6">Ranking de Notas</h3>
               <div className="h-64 w-full">
@@ -335,7 +335,7 @@ export const Stats: React.FC = () => {
           </div>
       </div>
 
-      {/* Risk Alert Section */}
+      {/* Seção de alertas de risco */}
       {riskSubjects.length > 0 && (
           <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/50 rounded-2xl p-6 print:border-red-200">
               <h3 className="text-lg font-bold text-red-800 dark:text-red-300 mb-4 flex items-center">
@@ -353,7 +353,7 @@ export const Stats: React.FC = () => {
           </div>
       )}
 
-      {/* Main Stats Table */}
+      {/* Tabela principal de estatísticas */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden print:border print:border-gray-300">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-bold text-gray-700 dark:text-white">Detalhamento por Matéria</h3>

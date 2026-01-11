@@ -1,12 +1,29 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, SystemSettings } from '../types';
+import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, SystemSettings, SubjectType, SubjectCategory } from '../types';
 import { DBService } from './db';
 import { Loader2 } from 'lucide-react';
 
 const StoreContext = createContext<AppContextType | undefined>(undefined);
 
 const cleanState: AppState = {
-  subjects: [],
+  subjects: [
+    { 
+        id: 'reposicao', 
+        name: 'Reposição', 
+        color: '#aaaaaa',
+        totalClasses: 0, 
+        type: SubjectType.ORGANIZATIONAL, 
+        category: SubjectCategory.OTHER 
+    },
+    { 
+        id: 'vago', 
+        name: 'Horário Vago', 
+        color: '#1c1c1c',
+        totalClasses: 0, 
+        type: SubjectType.ORGANIZATIONAL, 
+        category: SubjectCategory.OTHER 
+    }
+  ],
   schedule: [],
   logs: [],
   validations: [],
@@ -47,9 +64,19 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
         try {
             const data = await DBService.loadState(user, activeYear);
             if (data) {
+                const mergedSubjects = [...data.subjects];
+                
+                if (!mergedSubjects.find(s => s.id === 'reposicao')) {
+                    mergedSubjects.push(cleanState.subjects[0]);
+                }
+                if (!mergedSubjects.find(s => s.id === 'vago')) {
+                    mergedSubjects.push(cleanState.subjects[1]);
+                }
+
                 setState({
                     ...cleanState,
                     ...data,
+                    subjects: mergedSubjects,
                     settings: { ...cleanState.settings, ...(data.settings || {}), currentYear: activeYear }
                 });
             } else {
