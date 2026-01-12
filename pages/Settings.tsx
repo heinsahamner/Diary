@@ -596,7 +596,7 @@ export const Settings: React.FC = () => {
                       </div>
                       <span className="text-xs">?</span>
                   </a>
-                  <a href="#" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-1 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="https://microspace.forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-1 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                       <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">
                           <Globe size={20} />
                       </div>
