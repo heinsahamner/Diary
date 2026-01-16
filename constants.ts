@@ -44,7 +44,7 @@ const SLOT_TIMES = [
 
 const createSlots = (day: number, indices: number[]) => {
     return indices.map((subIndex, i) => {
-        if (subIndex === -1) return null;
+        if (subIndex === -1) return null; 
         return {
             day,
             start: SLOT_TIMES[i].start,
@@ -58,23 +58,23 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
   "INF": {
     "1": {
       subjects: [
-        { name: "Filosofia I", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 0
-        { name: "Espanhol", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 1
-        { name: "Arquitetura de Computadores", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 2
-        { name: "Geografia I", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 3
-        { name: "Matemática I", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 4
-        { name: "Química I", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
-        { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 6
+        { name: "Filosofia I", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Rafael Mello' }, // 0
+        { name: "Espanhol", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Neidelberg' }, // 1
+        { name: "Arquitetura de Computadores", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Nilson' }, // 2
+        { name: "Geografia I", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Cristiane' }, // 3
+        { name: "Matemática I", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Jardel' }, // 4
+        { name: "Química I", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafaela' }, // 5
+        { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS, teacher: 'Carla' }, // 6
         { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 7
-        { name: "LPLB I", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 8
-        { name: "História I", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 9
-        { name: "Algoritmos", color: "#8b5cf6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 10
-        { name: "Inglês I", color: "#fb7185", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 11
-        { name: "Informática Básica", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
-        { name: "Design Web", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
-        { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
-        { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 15
-        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES } // 16
+        { name: "LPLB I", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Daniele' }, // 8
+        { name: "História I", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Franklin' }, // 9
+        { name: "Algoritmos", color: "#8b5cf6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rodrigo' }, // 10
+        { name: "Inglês I", color: "#fb7185", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Suzana/Alessandra' }, // 11
+        { name: "Informática Básica", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher:  'Eliezer' }, // 12
+        { name: "Design Web", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafael Escalfoni' }, // 13
+        { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Raposo' }, // 14
+        { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Anderson' }, // 15
+        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Adriana' } // 16
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Filo, Filo, Esp, Esp, Arq, Arq
@@ -87,22 +87,22 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
     "2": {
       subjects: [
         { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 0
-        { name: "LPLB II", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 1
-        { name: "Filosofia II", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 2
-        { name: "Ed. Física II", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 3
-        { name: "Geografia II", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
-        { name: "Desenv. Web I", color: "#d946ef", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
-        { name: "Matemática II", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
-        { name: "Banco de Dados", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 7
-        { name: "Química II", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 8
-        { name: "Sociologia II", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 9
-        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 10
-        { name: "Biologia II", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 11
-        { name: "PC Web", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
-        { name: "Fund. Redes", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
-        { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
-        { name: "Ed. Artística I (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 15
-        { name: "História II", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES } // 16
+        { name: "LPLB II", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Daniele' }, // 1
+        { name: "Filosofia II", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Rafael Mello' }, // 2
+        { name: "Ed. Física II", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS, teacher: 'Carla' }, // 3
+        { name: "Geografia II", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Cristiane' }, // 4
+        { name: "Desenv. Web I", color: "#d946ef", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Vitor' }, // 5
+        { name: "Matemática II", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Jardel' }, // 6
+        { name: "Banco de Dados", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Eliezer' }, // 7
+        { name: "Química II", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafaela' }, // 8
+        { name: "Sociologia II", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Adriana' }, // 9
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Suzana/Alessandra/Neidelberg' }, // 10
+        { name: "Biologia II", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Anderson' }, // 11
+        { name: "PC Web", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafael Escalfoni' }, // 12
+        { name: "Fund. Redes", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Helga' }, // 13
+        { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Gustavo' }, // 14
+        { name: "Ed. Artística I (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS, teacher: 'Eduardo' }, // 15
+        { name: "História II", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Franklin' } // 16
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Rep, Rep, LPLB, LPLB, Fil, Fil
@@ -114,21 +114,21 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
     },
     "3": {
       subjects: [
-        { name: "LPLB III", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 0
-        { name: "Filosofia III", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 1
+        { name: "LPLB III", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Daniele' }, // 0
+        { name: "Filosofia III", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Rafael Mello' }, // 1
         { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 2
-        { name: "PDME", color: "#8b5cf6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 3
-        { name: "Química III", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 4
-        { name: "Matemática III", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
-        { name: "Desenv. Web II", color: "#d946ef", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
-        { name: "Geografia III", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 7
-        { name: "História III", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 8
-        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 9
-        { name: "Ed. Artística II (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 10
-        { name: "Sociologia III", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 11
-        { name: "Biologia III", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
-        { name: "Física III", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
-        { name: "Sist. Operacionais", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES } // 14
+        { name: "PDME", color: "#8b5cf6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Paulo H.' }, // 3
+        { name: "Química III", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafaela' }, // 4
+        { name: "Matemática III", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Jardel' }, // 5
+        { name: "Desenv. Web II", color: "#d946ef", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafael G.' }, // 6
+        { name: "Geografia III", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Cristiane' }, // 7
+        { name: "História III", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Franklin' }, // 8
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Suzana/Alessandra/Neidelberg' }, // 9
+        { name: "Ed. Artística II (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS, teacher: 'Eduardo' }, // 10
+        { name: "Sociologia III", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Adriana' }, // 11
+        { name: "Biologia III", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Anderson' }, // 12
+        { name: "Física III", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Gustavo' }, // 13
+        { name: "Sist. Operacionais", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Bruno' } // 14
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2, 3,3, 3,3]), // Seg: LPLB, LPLB, Fil, Fil, Rep, Rep, PDME, PDME, PDME, PDME
@@ -142,23 +142,23 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
   "ADM": {
     "1": {
       subjects: [
-        { name: "Filosofia I", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 0
-        { name: "Comp. Org.", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 1
-        { name: "Espanhol", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 2
-        { name: "Matemática I", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 3
-        { name: "Geografia I", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
-        { name: "Química I", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
+        { name: "Filosofia I", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Rafael Mello' }, // 0
+        { name: "Comp. Org.", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Suzanny' }, // 1
+        { name: "Espanhol", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Neidelberg' }, // 2
+        { name: "Matemática I", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Jardel' }, // 3
+        { name: "Geografia I", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Cristiane' }, // 4
+        { name: "Química I", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafaela' }, // 5
         { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 6
-        { name: "Fund. Adm.", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 7
-        { name: "LPLB I", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 8
-        { name: "Int. Inform.", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 9
-        { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 10
-        { name: "História I", color: "#b45309", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 11
-        { name: "Ética RSA", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
-        { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
-        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 14
-        { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 15
-        { name: "Inglês I", color: "#fb7185", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES } //16
+        { name: "Fund. Adm.", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Suzanny' }, // 7
+        { name: "LPLB I", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Daniele' }, // 8
+        { name: "Int. Inform.", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Eliezer' }, // 9
+        { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Anderson' }, // 10
+        { name: "História I", color: "#b45309", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Franklin' }, // 11
+        { name: "Ética RSA", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Mello' }, // 12
+        { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Raposo' }, // 13
+        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Adriana' }, // 14
+        { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS, teacher: 'Carla' }, // 15
+        { name: "Inglês I", color: "#fb7185", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Suzana/Alessandra' } //16
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Fil, Fil, COrg, COrg, Esp, Esp
@@ -171,23 +171,23 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
     "2": {
       subjects: [
         { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 0
-        { name: "LPLB II", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 1
-        { name: "Filosofia II", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 2
-        { name: "Ed. Física II", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 3
-        { name: "Geografia II", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
-        { name: "Marketing", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 5
-        { name: "Contabilidade", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
-        { name: "Matemática II", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 7
-        { name: "Logística", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 8
-        { name: "Química II", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 9
-        { name: "Sociologia II", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 10
-        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 11
-        { name: "História II", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
-        { name: "Legisl. Trab.", color: "#f472b6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 13
-        { name: "SIG e OSM", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
-        { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 15
-        { name: "Ed. Artística I (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 16
-        { name: "Biologia II", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES } // 17
+        { name: "LPLB II", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Daniele' }, // 1
+        { name: "Filosofia II", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Rafael Mello' }, // 2
+        { name: "Ed. Física II", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS, teacher: 'Carla' }, // 3
+        { name: "Geografia II", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Cristiane' }, // 4
+        { name: "Marketing", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Suzanny' }, // 5
+        { name: "Contabilidade", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Juliano' }, // 6
+        { name: "Matemática II", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Jardel' }, // 7
+        { name: "Logística", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Suzanny' }, // 8
+        { name: "Química II", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafaela' }, // 9
+        { name: "Sociologia II", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Adriana' }, // 10
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Suzana/Alessandra/Neidelberg' }, // 11
+        { name: "História II", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Franklin' }, // 12
+        { name: "Legisl. Trab.", color: "#f472b6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Mello' }, // 13
+        { name: "SIG e OSM", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Eliezer' }, // 14
+        { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Gustavo' }, // 15
+        { name: "Ed. Artística I (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS, teacher: 'Eduardo' }, // 16
+        { name: "Biologia II", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Anderson' } // 17
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Rep, Rep, LPLB, LPLB, Fil, Fil
@@ -199,22 +199,22 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
     },
     "3": {
       subjects: [
-        { name: "LPLB III", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 0
-        { name: "Filosofia III", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 1
-        { name: "Empreend. Inov.", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 2
-        { name: "Gest. Pessoas", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 3
-        { name: "Economia", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
-        { name: "Química III", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
-        { name: "Matemática III", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
-        { name: "APO", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 7
-        { name: "Adm. Finan. Orç.", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 8
-        { name: "Geografia III", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 9
-        { name: "História III", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 10
-        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 11
-        { name: "Ed. Artística II (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 12
-        { name: "Sociologia III", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 13
-        { name: "Biologia III", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
-        { name: "Física III", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 15
+        { name: "LPLB III", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Daniele' }, // 0
+        { name: "Filosofia III", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Rafael Mello' }, // 1
+        { name: "Empreend. Inov.", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Suzanny' }, // 2
+        { name: "Gest. Pessoas", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Márcio' }, // 3
+        { name: "Economia", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Ivan' }, // 4
+        { name: "Química III", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Rafaela' }, // 5
+        { name: "Matemática III", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Jardel' }, // 6
+        { name: "APO", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Márcio' }, // 7
+        { name: "Adm. Finan. Orç.", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Suzanny' }, // 8
+        { name: "Geografia III", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Cristiane' }, // 9
+        { name: "História III", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'André Franklin' }, // 10
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES, teacher: 'Suzana/Alessandra/Neidelberg' }, // 11
+        { name: "Ed. Artística II (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS, teacher: 'Eduardo' }, // 12
+        { name: "Sociologia III", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES, teacher: 'Adriana' }, // 13
+        { name: "Biologia III", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Anderson' }, // 14
+        { name: "Física III", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES, teacher: 'Gustavo' }, // 15
         { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER } // 16
       ],
       schedule: [
