@@ -261,7 +261,7 @@ export const Settings: React.FC = () => {
                   <SettingsItem 
                     icon={<Info size={20} />} 
                     label="Sobre" 
-                    value="v4.0.0" 
+                    value="v2.0.0" 
                     onClick={() => setActiveTab('about')} 
                   />
               </SettingsGroup>
@@ -459,31 +459,31 @@ export const Settings: React.FC = () => {
                 </div>
             </SettingsGroup>
 
-            <SettingsGroup title="Conecte-se">
-                  <a href="https://github.com/lucas-willian" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+            <SettingsGroup title="Links">
+                  <a href="https://forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 group-hover:bg-black group-hover:text-white transition-colors">
-                              <Github size={20} />
+                              <User size={20} />
                           </div>
-                          <span className="font-medium text-gray-700 dark:text-gray-200">GitHub</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-200">Fórum</span>
                       </div>
                       <ChevronRight size={16} className="text-gray-400" />
                   </a>
-                  <a href="https://linkedin.com/in/lucas-willian" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+                  <a href="https://microspace.forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                              <Linkedin size={20} />
+                              <Atomics size={20} />
                           </div>
-                          <span className="font-medium text-gray-700 dark:text-gray-200">LinkedIn</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-200">Microspace</span>
                       </div>
                       <ChevronRight size={16} className="text-gray-400" />
                   </a>
-                  <a href="https://lucaswillian.dev" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+                  <a href="https://notes.forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                              <Globe size={20} />
+                              <Pencil size={20} />
                           </div>
-                          <span className="font-medium text-gray-700 dark:text-gray-200">Portfolio</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-200">Notes</span>
                       </div>
                       <ChevronRight size={16} className="text-gray-400" />
                   </a>
