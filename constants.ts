@@ -79,7 +79,7 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Filo, Filo, Esp, Esp, Arq, Arq
           ...createSlots(2, [3,3, 4,4, 5,5, 6,6, 7,7]), // Ter: Geo, Geo, Mat, Mat, Quim, Quim, EdFis, EdFis, Rep, Rep
-          ...createSlots(3, [8,8, 4,4, 9,9, 10,10, 10,10]), // Qua: LPLB, LPLB, Mat, Mat, Hist, Hist, Alg, Alg, Alg, Alg
+          ...createSlots(3, [8,8, 4,4, 9,9]), // Qua: LPLB, LPLB, Mat, Mat, Hist, Hist
           ...createSlots(4, [7,7, 8,8, 11,11, 12,12, 13,13]), // Qui: Rep, Rep, LPLB, LPLB, Ing, Ing, InfBas, InfBas, DesWeb, DesWeb
           ...createSlots(5, [14,14, 15,15, 16,16, 10,10, 10,10]) // Sex: Fis, Fis, Bio, Bio, Soc, Soc, Alg, Alg, Alg, Alg
       ]
@@ -101,13 +101,14 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
         { name: "PC Web", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
         { name: "Fund. Redes", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
         { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
-        { name: "Ed. Artística I (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS } // 15
+        { name: "Ed. Artística I (Música)", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 15
+        { name: "História II", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES } // 16
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Rep, Rep, LPLB, LPLB, Fil, Fil
           ...createSlots(2, [3,3, 1,1, 4,4, 5,5, 5,5]), // Ter: EdFis, EdFis, LPLB, LPLB, Geo, Geo, DWeb, DWeb, DWeb, DWeb
-          ...createSlots(3, [6,6, 7,7, 8,8, 9,9, 0,0]), // Qua: Mat, Mat, BD, BD, Quim, Quim, Soc, Soc, Rep, Rep
-          ...createSlots(4, [6,6, 10,10, 11,11, 12,12, 13,13]), // Qui: Mat, Mat, LinEst, LinEst, Bio, Bio, PCWeb, PCWeb, FRedes, FRedes
+          ...createSlots(3, [6,6, 7,7, 8,8]), // Qua: Mat, Mat, BD, BD, Quim, Quim
+          ...createSlots(4, [6,6, 10,10, 16,16, 12,12, 13,13]), // Qui: Mat, Mat, LinEst, LinEst, Hist, Hist, PCWeb, PCWeb, FRedes, FRedes
           ...createSlots(5, [14,14, 15,15, 11,11, 9,9, 0,0]) // Sex: Fis, Fis, Art, Art, Bio, Bio, Soc, Soc, Rep, Rep
       ]
     },
@@ -155,13 +156,15 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
         { name: "História I", color: "#b45309", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 11
         { name: "Ética RSA", color: "#84cc16", totalClasses: 40, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
         { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
-        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES } // 14
+        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 14
+        { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 15
+        { name: "Inglês I", color: "#fb7185", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES } //16
       ],
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Fil, Fil, COrg, COrg, Esp, Esp
-          ...createSlots(2, [3,3, 4,4, 5,5, 6,6, 6,6]), // Ter: Mat, Mat, Geo, Geo, Quim, Quim, Rep, Rep, Rep, Rep
-          ...createSlots(3, [7,7, 8,8, 9,9, 10,10, 6,6]), // Qua: FAdm, FAdm, LPLB, LPLB, IntInf, IntInf, Bio, Bio, Rep, Rep
-          ...createSlots(4, [8,8, 3,3, 11,11, 11,11, 12,12]), // Qui: LPLB, LPLB, Mat, Mat, Hist, Hist, Hist, Hist, Etica, Etica
+          ...createSlots(2, [3,3, 4,4, 5,5, 15,15, 6,6]), // Ter: Mat, Mat, Geo, Geo, Quim, Quim, EdFis, EdFis, Rep, Rep
+          ...createSlots(3, [7,7, 8,8, 9,9]), // Qua: FAdm, FAdm, LPLB, LPLB, IntInf, IntInf
+          ...createSlots(4, [8,8, 3,3, 16,16, 11,11, 12,12]), // Qui: LPLB, LPLB, Mat, Mat, Ing, Ing, Hist, Hist, Etica, Etica
           ...createSlots(5, [6,6, 13,13, 14,14, 10,10, 6,6]) // Sex: Rep, Rep, Fis, Fis, Soc, Soc, Bio, Bio, Rep, Rep
       ]
     },
@@ -189,7 +192,7 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
       schedule: [
           ...createSlots(1, [0,0, 1,1, 2,2]), // Seg: Rep, Rep, LPLB, LPLB, Fil, Fil
           ...createSlots(2, [3,3, 1,1, 4,4, 5,5, 6,6]), // Ter: EdFis, EdFis, LPLB, LPLB, Geo, Geo, Mkt, Mkt, Cont, Cont
-          ...createSlots(3, [7,7, 8,8, 9,9, 10,10, 0,0]), // Qua: Mat, Mat, Log, Log, Quim, Quim, Soc, Soc, Rep, Rep
+          ...createSlots(3, [7,7, 8,8, 9,9]), // Qua: Mat, Mat, Log, Log, Quim, Quim
           ...createSlots(4, [7,7, 11,11, 12,12, 13,13, 14,14]), // Qui: Mat, Mat, LinEst, LinEst, Hist, Hist, LegT, LegT, SIG, SIG
           ...createSlots(5, [15,15, 16,16, 17,17, 10,10, 0,0]) // Sex: Fis, Fis, Art, Art, Bio, Bio, Soc, Soc, Rep, Rep
       ]
