@@ -4,15 +4,18 @@ import { TRIMESTERS } from '../constants';
 import { Plus, Trash2, Calculator, Star } from 'lucide-react';
 import { Assessment, SubjectType, GradingSystem } from '../types';
 
-const calculateSubjectAverage = (assessments: Assessment[], subjectId: string, trimester: number | null, method: 'running' | 'absolute', gradingSystem: GradingSystem) => {
-    
+const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | undefined, trimester: number | null, method: 'running' | 'absolute', globalGradingSystem: GradingSystem) => {
+    if (!subject) return 0;
+
+    const gradingSystem = subject.gradingMethod || globalGradingSystem;
+
     if (trimester === null) {
         let sumAverages = 0;
         let countTrimesters = 0;
         
         TRIMESTERS.forEach(t => {
-             const tAvg = calculateSubjectAverage(assessments, subjectId, t, method, gradingSystem);
-             if (tAvg > 0 || assessments.some(a => a.subjectId === subjectId && a.trimester === t)) {
+             const tAvg = calculateSubjectAverage(assessments, subject, t, method, globalGradingSystem);
+             if (tAvg > 0 || assessments.some(a => a.subjectId === subject.id && a.trimester === t)) {
                  sumAverages += tAvg;
                  countTrimesters++;
              }
@@ -23,7 +26,7 @@ const calculateSubjectAverage = (assessments: Assessment[], subjectId: string, t
         return Math.min(10, sumAverages / countTrimesters);
     }
 
-    const filtered = assessments.filter(a => a.subjectId === subjectId && a.trimester === trimester);
+    const filtered = assessments.filter(a => a.subjectId === subject.id && a.trimester === trimester);
     if (filtered.length === 0) return 0;
 
     let result = 0;
@@ -69,11 +72,12 @@ export const Grades: React.FC = () => {
   const [isExtra, setIsExtra] = useState(false);
 
   const currentSubject = subjects.find(s => s.id === selectedSubjectId);
+  const activeGradingSystem = currentSubject?.gradingMethod || settings.gradingSystem || 'average';
   const subjectAssessments = assessments.filter(a => 
     a.subjectId === selectedSubjectId && a.trimester === selectedTrimester
   );
 
-  const currentTrimesterAvg = calculateSubjectAverage(assessments, selectedSubjectId, selectedTrimester, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+  const currentTrimesterAvg = calculateSubjectAverage(assessments, currentSubject, selectedTrimester, settings.gradeCalcMethod, settings.gradingSystem || 'average');
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,13 +108,14 @@ export const Grades: React.FC = () => {
 
   const neededScore = (() => {
      if (settings.gradeCalcMethod !== 'absolute') return null;
+     if (!currentSubject) return null;
      
      let currentSum = 0;
      let passedTrimesters = 0;
      TRIMESTERS.forEach(t => {
          const hasAssessments = assessments.some(a => a.subjectId === selectedSubjectId && a.trimester === t);
          if (hasAssessments) {
-             currentSum += calculateSubjectAverage(assessments, selectedSubjectId, t, 'absolute', settings.gradingSystem || 'average');
+             currentSum += calculateSubjectAverage(assessments, currentSubject, t, 'absolute', settings.gradingSystem || 'average');
              passedTrimesters++;
          }
      });
@@ -167,7 +172,7 @@ export const Grades: React.FC = () => {
            )}
         </div>
 
-        {subjects.length > 0 && (
+        {subjects.length > 0 && currentSubject && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Coluna Esquerda: input e seleção do trimestre */}
             <div className="lg:col-span-2 space-y-6">
@@ -202,8 +207,8 @@ export const Grades: React.FC = () => {
                                         {a.isExtra && <span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 rounded-full font-bold">Extra</span>}
                                     </div>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {settings.gradingSystem === 'average' && !a.isExtra ? `Peso: ${a.weight}` : 
-                                         settings.gradingSystem === 'sum' ? 'Pontos somados' : ''}
+                                        {activeGradingSystem === 'average' && !a.isExtra ? `Peso: ${a.weight}` : 
+                                         activeGradingSystem === 'sum' ? 'Pontos somados' : ''}
                                     </p>
                                 </div>
                                 <div className="flex items-center space-x-4">
@@ -245,7 +250,7 @@ export const Grades: React.FC = () => {
                         </div>
                          
                          {/* Mostrar peso apenas se for média e não forem pontos extras */}
-                         {settings.gradingSystem === 'average' && !isExtra && (
+                         {activeGradingSystem === 'average' && !isExtra && (
                              <div className="relative">
                                 <input 
                                     type="number" 
@@ -282,7 +287,8 @@ export const Grades: React.FC = () => {
                     <h3 className="text-indigo-100 text-sm font-medium mb-1">Média {selectedTrimester}º Trimestre</h3>
                     <div className="text-5xl font-bold mb-2">{currentTrimesterAvg.toFixed(2)}</div>
                     <div className="flex flex-col text-indigo-200 text-xs gap-1">
-                        <span>Sistema: {settings.gradingSystem === 'sum' ? 'Somatória' : settings.gradingSystem === 'manual' ? 'Manual' : 'Média Ponderada'}</span>
+                        <span>Sistema: {activeGradingSystem === 'sum' ? 'Somatória' : activeGradingSystem === 'manual' ? 'Manual' : 'Média Ponderada'}</span>
+                        {activeGradingSystem !== settings.gradingSystem && <span>(Personalizado para Matéria)</span>}
                         <span>{subjectAssessments.length} lançamentos</span>
                     </div>
             </div>
@@ -324,10 +330,10 @@ export const Grades: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-gray-900 dark:text-gray-200">
                           {subjects.filter(s => s.type === SubjectType.NORMAL).map(sub => {
-                              const t1 = calculateSubjectAverage(assessments, sub.id, 1, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              const t2 = calculateSubjectAverage(assessments, sub.id, 2, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              const t3 = calculateSubjectAverage(assessments, sub.id, 3, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              const final = calculateSubjectAverage(assessments, sub.id, null, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+                              const t1 = calculateSubjectAverage(assessments, sub, 1, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+                              const t2 = calculateSubjectAverage(assessments, sub, 2, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+                              const t3 = calculateSubjectAverage(assessments, sub, 3, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+                              const final = calculateSubjectAverage(assessments, sub, null, settings.gradeCalcMethod, settings.gradingSystem || 'average');
                               
                               return (
                                   <tr key={sub.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">

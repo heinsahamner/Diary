@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useStore } from '../services/store';
 import { SubjectType, Subject, ScheduleSlot, Subject as SubjectTypeInterface, GradeCalcMethod, GradingSystem, SubjectCategory } from '../types';
-import { Plus, X, Trash2, Save, Moon, Sun, Bell, Database, FileUp, FileDown, Pencil, LogOut, Info, ExternalLink, Upload, Loader2, Github, Linkedin, Globe } from 'lucide-react';
-import { DAYS_OF_WEEK } from '../constants';
+import { Plus, X, Trash2, Save, Moon, Sun, Bell, Database, FileUp, FileDown, Pencil, LogOut, Info, ExternalLink, Upload, Loader2, Github, Linkedin, Globe, BookTemplate, PenTool, CheckCircle, ChevronRight, ArrowLeft } from 'lucide-react';
+import { DAYS_OF_WEEK, PREDEFINED_GRADEBOOKS } from '../constants';
 import { DBService } from '../services/db';
 
 export const Settings: React.FC = () => {
@@ -10,6 +10,9 @@ export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'preferences' | 'academic' | 'data' | 'subjects' | 'schedule' | 'about'>('preferences');
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  const [subjectViewMode, setSubjectViewMode] = useState<'menu' | 'manual' | 'preset'>('menu');
+  const [presetCourse, setPresetCourse] = useState<string | null>(null);
+
   const [serverUrl, setServerUrl] = useState('https://nao-tem-backup-ainda.sorry');
   const [isUploading, setIsUploading] = useState(false);
 
@@ -20,6 +23,7 @@ export const Settings: React.FC = () => {
   const [subType, setSubType] = useState<SubjectType>(SubjectType.NORMAL);
   const [subTeacher, setSubTeacher] = useState('');
   const [subCategory, setSubCategory] = useState<SubjectCategory>(SubjectCategory.OTHER);
+  const [subGradingMethod, setSubGradingMethod] = useState<GradingSystem | ''>('');
 
   const [schedDay, setSchedDay] = useState(1);
   const [schedStart, setSchedStart] = useState('07:00');
@@ -37,7 +41,8 @@ export const Settings: React.FC = () => {
         totalClasses: subClasses,
         type: subType,
         teacher: subTeacher,
-        category: subCategory
+        category: subCategory,
+        gradingMethod: subGradingMethod === '' ? undefined : subGradingMethod
     };
 
     if (editingSubjectId) {
@@ -53,9 +58,11 @@ export const Settings: React.FC = () => {
     setSubColor('#6366f1');
     setSubType(SubjectType.NORMAL);
     setSubCategory(SubjectCategory.OTHER);
+    setSubGradingMethod('');
   };
 
   const handleEditClick = (s: Subject) => {
+      setSubjectViewMode('manual'); 
       setEditingSubjectId(s.id);
       setSubName(s.name);
       setSubColor(s.color);
@@ -63,6 +70,7 @@ export const Settings: React.FC = () => {
       setSubType(s.type);
       setSubTeacher(s.teacher || '');
       setSubCategory(s.category || SubjectCategory.OTHER);
+      setSubGradingMethod(s.gradingMethod || '');
   };
 
   const handleCancelEdit = () => {
@@ -73,7 +81,49 @@ export const Settings: React.FC = () => {
       setSubColor('#6366f1');
       setSubType(SubjectType.NORMAL);
       setSubCategory(SubjectCategory.OTHER);
+      setSubGradingMethod('');
   }
+  
+  const handlePresetSelect = (course: string, year: string) => {
+      const template = PREDEFINED_GRADEBOOKS[course]?.[year];
+      if (template) {
+          if (window.confirm(`Isso irá adicionar ${template.subjects.length} matérias e ${template.schedule.length} aulas à sua grade. Deseja continuar?`)) {
+              
+              const createdSubjectIds: string[] = [];
+              template.subjects.forEach((t, index) => {
+                  const newId = Date.now().toString() + index;
+                  createdSubjectIds.push(newId);
+                  
+                  const newSubject: SubjectTypeInterface = {
+                      id: newId,
+                      name: t.name || 'Nova Matéria',
+                      color: t.color || '#ccc',
+                      totalClasses: t.totalClasses || 80,
+                      type: t.type || SubjectType.NORMAL,
+                      category: t.category || SubjectCategory.OTHER,
+                      gradingMethod: undefined 
+                  };
+                  addSubject(newSubject);
+              });
+
+              const newSlots: ScheduleSlot[] = template.schedule.map((slot, idx) => ({
+                  id: Date.now().toString() + '_slot_' + idx,
+                  dayOfWeek: slot.day,
+                  startTime: slot.start,
+                  endTime: slot.end,
+                  subjectId: createdSubjectIds[slot.subjectIndex] || ''
+              })).filter(s => s.subjectId !== '');
+
+              if (newSlots.length > 0) {
+                  const updatedSchedule = [...schedule, ...newSlots].sort((a,b) => a.startTime.localeCompare(b.startTime));
+                  updateSchedule(updatedSchedule);
+              }
+
+              alert('Grade predefinida carregada com sucesso!');
+              setSubjectViewMode('manual');
+          }
+      }
+  };
 
   const handleAddSlot = (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,10 +196,9 @@ export const Settings: React.FC = () => {
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Configurações</h1>
       
       <div className="flex space-x-4 mb-6 border-b border-gray-200 dark:border-gray-700 overflow-x-auto no-scrollbar">
-          {/* Abas */}
           {[
               { id: 'preferences', label: 'Preferências' },
-              { id: 'academic', label: 'Definições' },
+              { id: 'academic', label: 'Acadêmico' },
               { id: 'subjects', label: 'Matérias' },
               { id: 'schedule', label: 'Grade' },
               { id: 'data', label: 'Dados' },
@@ -162,7 +211,15 @@ export const Settings: React.FC = () => {
                     ? 'border-b-2 border-indigo-600 dark:border-purple-500 text-indigo-600 dark:text-purple-400' 
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                 }`}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => {
+                    setActiveTab(tab.id as any);
+                    if (tab.id !== 'subjects') {
+                        setSubjectViewMode('menu');
+                        setPresetCourse(null);
+                    } else if (subjects.length > 2) {
+                         setSubjectViewMode('manual');
+                    }
+                }}
               >
                   {tab.label}
               </button>
@@ -231,18 +288,18 @@ export const Settings: React.FC = () => {
             </div>
 
             <div>
-               <label className="block text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">Sistema de Notas (Trimestral)</label>
+               <label className="block text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">Sistema de Notas Padrão</label>
                <select
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   value={settings.gradingSystem || 'average'}
                   onChange={(e) => updateSettings({...settings, gradingSystem: e.target.value as GradingSystem})}
                >
-                   <option value="average">Média Ponderada (Padrão)</option>
+                   <option value="average">Média Ponderada</option>
                    <option value="sum">Somatória de Pontos</option>
                    <option value="manual">Entrada Manual (Calculadora Desativada)</option>
                </select>
                <p className="text-xs text-gray-400 mt-2">
-                   Define como a nota do trimestre é calculada com base nas atividades.
+                   Este é o método padrão. Você pode alterar por matéria individualmente.
                </p>
             </div>
 
@@ -284,7 +341,6 @@ export const Settings: React.FC = () => {
 
       {activeTab === 'data' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Gerenciamento de arquivos locais */}
               <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-6 h-fit">
                 <h3 className="font-bold text-gray-700 dark:text-gray-200">Arquivo Local (Manual)</h3>
                 
@@ -314,7 +370,6 @@ export const Settings: React.FC = () => {
                 </p>
              </div>
 
-             {/* Backup na nuvem (simulado) */}
              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm space-y-6 h-fit">
                 <div className="flex items-center gap-2 text-indigo-600 dark:text-purple-400">
                     <Upload size={24} />
@@ -350,119 +405,222 @@ export const Settings: React.FC = () => {
       )}
 
       {activeTab === 'subjects' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Lista */}
-              <div className="space-y-3">
-                  <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-2">Matérias Atuais ({settings.currentYear})</h3>
-                  {subjects.filter(s => s.id !== 'vago').map(s => (
-                      <div key={s.id} className={`flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border transition-all ${editingSubjectId === s.id ? 'border-indigo-500 ring-1 ring-indigo-200 dark:border-purple-500' : 'border-gray-200 dark:border-gray-700'}`}>
-                          <div className="flex items-center space-x-3">
-                              <div className="w-6 h-6 rounded-full" style={{ backgroundColor: s.color }} />
-                              <div>
-                                  <p className="font-semibold text-gray-800 dark:text-white">{s.name}</p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">{s.category || 'Outros'} • {s.totalClasses} Aulas</p>
-                              </div>
-                          </div>
-                          <div className="flex space-x-2">
-                             <button onClick={() => handleEditClick(s)} className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-purple-400 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                                  <Pencil size={18} />
-                             </button>
-                             <button onClick={() => removeSubject(s.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
-                                  <Trash2 size={18} />
-                             </button>
-                          </div>
-                      </div>
-                  ))}
-                  {subjects.length === 0 && <p className="text-sm text-gray-400 italic">Nenhuma matéria cadastrada para este ano.</p>}
-              </div>
+          <div>
+            {subjectViewMode === 'menu' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto py-10">
+                    <button 
+                        onClick={() => setSubjectViewMode('preset')}
+                        className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-purple-500 hover:shadow-md transition-all group"
+                    >
+                        <div className="w-16 h-16 bg-indigo-50 dark:bg-purple-900/20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <BookTemplate className="text-indigo-600 dark:text-purple-400" size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Grade Predefinida</h3>
+                        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                            Carregar matérias automaticamente a partir de um curso existente (ADM, INFO).
+                        </p>
+                    </button>
 
-              {/* Adicionar/Editar */}
-              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 h-fit">
-                  <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-bold text-gray-700 dark:text-gray-200">{editingSubjectId ? 'Editar Matéria' : 'Adicionar Matéria'}</h3>
-                      {editingSubjectId && (
-                          <button onClick={handleCancelEdit} className="text-xs text-gray-500 hover:text-red-500">Cancelar</button>
-                      )}
-                  </div>
-                  <form onSubmit={handleSubjectSubmit} className="space-y-4">
-                      <div>
-                          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Nome</label>
-                          <input 
-                            type="text" 
-                            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                            value={subName}
-                            onChange={e => setSubName(e.target.value)}
-                            required
-                            placeholder="Ex: Matemática"
-                          />
-                      </div>
-                       <div className="grid grid-cols-2 gap-4">
+                    <button 
+                        onClick={() => setSubjectViewMode('manual')}
+                        className="flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-purple-500 hover:shadow-md transition-all group"
+                    >
+                        <div className="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <PenTool className="text-gray-600 dark:text-gray-300" size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Criar Grade</h3>
+                        <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                            Adicionar matérias manualmente, uma por uma, personalizando cores e professores.
+                        </p>
+                    </button>
+                </div>
+            )}
+
+            {subjectViewMode === 'preset' && (
+                <div className="max-w-2xl mx-auto">
+                    <button 
+                        onClick={() => { setPresetCourse(null); setSubjectViewMode('menu'); }}
+                        className="flex items-center text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white mb-6"
+                    >
+                        <ArrowLeft size={20} className="mr-2" /> Voltar
+                    </button>
+
+                    {!presetCourse ? (
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Selecione o Curso</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                {Object.keys(PREDEFINED_GRADEBOOKS).map(course => (
+                                    <button 
+                                        key={course}
+                                        onClick={() => setPresetCourse(course)}
+                                        className="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-purple-500 transition-all font-bold text-xl text-gray-700 dark:text-gray-200"
+                                    >
+                                        {course}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">Selecione o Ano ({presetCourse})</h3>
+                            <div className="grid grid-cols-1 gap-3">
+                                {Object.keys(PREDEFINED_GRADEBOOKS[presetCourse]).map(year => (
+                                    <button 
+                                        key={year}
+                                        onClick={() => handlePresetSelect(presetCourse, year)}
+                                        className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-purple-500 transition-all group"
+                                    >
+                                        <div className="text-left">
+                                            <span className="font-bold text-gray-800 dark:text-white block">{year}º Ano</span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">{PREDEFINED_GRADEBOOKS[presetCourse][year].subjects.length} Matérias</span>
+                                        </div>
+                                        <ChevronRight className="text-gray-400 group-hover:text-indigo-500" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {subjectViewMode === 'manual' && (
+                <>
+                <div className="flex items-center justify-between mb-6">
+                    <button 
+                        onClick={() => setSubjectViewMode('menu')}
+                        className="flex items-center text-sm text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                    >
+                        <ArrowLeft size={16} className="mr-1" /> Menu de Grade
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                        <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-2">Matérias Atuais ({settings.currentYear})</h3>
+                        {subjects.map(s => (
+                            <div key={s.id} className={`flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border transition-all ${editingSubjectId === s.id ? 'border-indigo-500 ring-1 ring-indigo-200 dark:border-purple-500' : 'border-gray-200 dark:border-gray-700'}`}>
+                                <div className="flex items-center space-x-3">
+                                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: s.color }} />
+                                    <div>
+                                        <p className="font-semibold text-gray-800 dark:text-white">{s.name}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">{s.category || 'Outros'} • {s.totalClasses} Aulas</p>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button onClick={() => handleEditClick(s)} className="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-purple-400 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                                        <Pencil size={18} />
+                                    </button>
+                                    <button onClick={() => removeSubject(s.id)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                        {subjects.length === 0 && <p className="text-sm text-gray-400 italic">Nenhuma matéria cadastrada para este ano.</p>}
+                    </div>
+
+                    <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 h-fit">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-bold text-gray-700 dark:text-gray-200">{editingSubjectId ? 'Editar Matéria' : 'Adicionar Matéria'}</h3>
+                            {editingSubjectId && (
+                                <button onClick={handleCancelEdit} className="text-xs text-gray-500 hover:text-red-500">Cancelar</button>
+                            )}
+                        </div>
+                        <form onSubmit={handleSubjectSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Professor(a)</label>
+                                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Nome</label>
                                 <input 
                                     type="text" 
                                     className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    value={subTeacher}
-                                    onChange={e => setSubTeacher(e.target.value)}
-                                    placeholder="Opcional"
+                                    value={subName}
+                                    onChange={e => setSubName(e.target.value)}
+                                    required
+                                    placeholder="Ex: Matemática"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Categoria (Perfil)</label>
-                                <select
-                                    className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    value={subCategory}
-                                    onChange={e => setSubCategory(e.target.value as SubjectCategory)}
-                                >
-                                    {Object.values(SubjectCategory).map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
+                            <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Professor(a)</label>
+                                        <input 
+                                            type="text" 
+                                            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                            value={subTeacher}
+                                            onChange={e => setSubTeacher(e.target.value)}
+                                            placeholder="Opcional"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Categoria (Perfil)</label>
+                                        <select
+                                            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                            value={subCategory}
+                                            onChange={e => setSubCategory(e.target.value as SubjectCategory)}
+                                        >
+                                            {Object.values(SubjectCategory).map(cat => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                             </div>
-                      </div>
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Cor</label>
-                            <input 
-                                type="color" 
-                                className="w-full h-10 p-1 rounded-lg border border-gray-300 dark:border-gray-600"
-                                value={subColor}
-                                onChange={e => setSubColor(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Total Aulas (Ano)</label>
-                             <input 
-                                type="number" 
-                                className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white no-spinner"
-                                value={subClasses}
-                                onChange={e => setSubClasses(Number(e.target.value))}
-                            />
-                        </div>
-                      </div>
-                      <div>
-                           <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Tipo</label>
-                           <select 
-                            className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                            value={subType}
-                            onChange={e => setSubType(e.target.value as SubjectType)}
-                           >
-                               <option value={SubjectType.NORMAL}>Normal (Conta Notas e Faltas)</option>
-                               <option value={SubjectType.ORGANIZATIONAL}>Organizacional (Intervalo/Almoço)</option>
-                               <option value={SubjectType.EXTENSION}>Extensão (Só Presença)</option>
-                           </select>
-                      </div>
-                      <button type="submit" className={`w-full text-white py-2 rounded-lg font-bold transition-colors ${editingSubjectId ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 dark:bg-purple-600 hover:bg-indigo-700 dark:hover:bg-purple-700'}`}>
-                          {editingSubjectId ? 'Salvar Alterações' : 'Adicionar'}
-                      </button>
-                  </form>
-              </div>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Cor</label>
+                                    <input 
+                                        type="color" 
+                                        className="w-full h-10 p-1 rounded-lg border border-gray-300 dark:border-gray-600"
+                                        value={subColor}
+                                        onChange={e => setSubColor(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Total Aulas (Ano)</label>
+                                    <input 
+                                        type="number" 
+                                        className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white no-spinner"
+                                        value={subClasses}
+                                        onChange={e => setSubClasses(Number(e.target.value))}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Tipo</label>
+                                    <select 
+                                        className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                        value={subType}
+                                        onChange={e => setSubType(e.target.value as SubjectType)}
+                                    >
+                                        <option value={SubjectType.NORMAL}>Normal (Conta Notas)</option>
+                                        <option value={SubjectType.ORGANIZATIONAL}>Organizacional</option>
+                                        <option value={SubjectType.EXTENSION}>Extensão</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">Sistema de Notas</label>
+                                    <select 
+                                        className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                        value={subGradingMethod}
+                                        onChange={e => setSubGradingMethod(e.target.value as GradingSystem)}
+                                    >
+                                        <option value="">Padrão ({settings.gradingSystem === 'sum' ? 'Soma' : 'Média'})</option>
+                                        <option value="average">Média Ponderada</option>
+                                        <option value="sum">Somatória</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" className={`w-full text-white py-2 rounded-lg font-bold transition-colors ${editingSubjectId ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 dark:bg-purple-600 hover:bg-indigo-700 dark:hover:bg-purple-700'}`}>
+                                {editingSubjectId ? 'Salvar Alterações' : 'Adicionar'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                </>
+            )}
           </div>
       )}
 
       {activeTab === 'schedule' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Slot de Adicionar */}
               <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 h-fit">
                   <h3 className="font-bold text-gray-700 dark:text-gray-200 mb-4">Adicionar Aula</h3>
                   <form onSubmit={handleAddSlot} className="space-y-4">
@@ -507,7 +665,7 @@ export const Settings: React.FC = () => {
                             value={schedSubject}
                             onChange={e => setSchedSubject(e.target.value)}
                           >
-                            {subjects.map(s => (
+                            {subjects.filter(s => s.id !== 'vago').map(s => (
                                 <option key={s.id} value={s.id}>{s.name}</option>
                             ))}
                           </select>
@@ -518,7 +676,6 @@ export const Settings: React.FC = () => {
                   </form>
               </div>
 
-              {/* Lista/preview da Grade */}
               <div className="lg:col-span-2 space-y-6">
                  {DAYS_OF_WEEK.map((dayName, index) => {
                      const daySlots = schedule.filter(s => s.dayOfWeek === index).sort((a,b) => a.startTime.localeCompare(b.startTime));
@@ -566,8 +723,8 @@ export const Settings: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-2xl mx-auto text-center space-y-8">
               <div>
                   <h2 className="text-3xl font-bold text-indigo-600 dark:text-purple-400 mb-2">Diary</h2>
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">um aplicativo Microspace</p>
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">versão 1.2.1</p>
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">um app Microspace</p>
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">versão 1.2.2</p>
               </div>
 
               <div className="bg-indigo-50 dark:bg-purple-900/10 p-4 rounded-xl inline-block">
@@ -586,7 +743,6 @@ export const Settings: React.FC = () => {
                       <li>Use o <strong>Diário</strong> para registrar presenças e faltas.</li>
                       <li>Acompanhe seu desempenho e notas em <strong>Notas</strong> e <strong>Análise</strong>.</li>
                       <li>Gerencie seus trabalhos e provas em <strong>Tarefas</strong>.</li>
-                      <li>Por enquanto o Diary não suporta salvamentos na nuvem, então seus dados atuais só são acessíveis <strong>neste dispositivo</strong>, mas, se quiser acessá-los em outros, exporte manualmente o .json na aba <strong>Dados</strong>.</li>
                   </ul>
               </div>
 
@@ -595,7 +751,7 @@ export const Settings: React.FC = () => {
                       <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">
                           <Globe size={20} />
                       </div>
-                      <span className="text-xs">?</span>
+                      <span className="text-xs">Notes</span>
                   </a>
                   <a href="https://microspace.forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center space-y-1 text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                       <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full">

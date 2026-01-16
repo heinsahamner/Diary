@@ -42,6 +42,7 @@ export interface Subject {
   totalClasses: number; 
   type: SubjectType;
   category?: SubjectCategory;
+  gradingMethod?: GradingSystem;
 }
 
 export interface ScheduleSlot {

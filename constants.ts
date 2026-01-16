@@ -1,4 +1,4 @@
-import { SubjectType } from './types';
+import { SubjectType, SubjectCategory, Subject } from './types';
 
 export const DAYS_OF_WEEK = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
@@ -13,13 +13,214 @@ export const MOCK_SUBJECTS = [
 ];
 
 export const DEFAULT_SCHEDULE_SLOTS = [
-  { id: 's1', dayOfWeek: 1, startTime: '07:00', endTime: '07:50', subjectId: '1' },
-  { id: 's2', dayOfWeek: 1, startTime: '07:50', endTime: '08:40', subjectId: '2' },
-  { id: 's3', dayOfWeek: 1, startTime: '08:40', endTime: '09:30', subjectId: '3' },
-  { id: 's4', dayOfWeek: 1, startTime: '09:50', endTime: '10:40', subjectId: '4' },
-  { id: 's5', dayOfWeek: 1, startTime: '10:40', endTime: '11:30', subjectId: '5' },
-  
-  { id: 's6', dayOfWeek: 2, startTime: '07:00', endTime: '07:50', subjectId: '5' },
-  { id: 's7', dayOfWeek: 2, startTime: '07:50', endTime: '08:40', subjectId: '1' },
-  { id: 's8', dayOfWeek: 3, startTime: '07:00', endTime: '08:40', subjectId: '3' }, 
+  { id: 's1', dayOfWeek: 1, startTime: '07:30', endTime: '08:20', subjectId: '1' },
+  { id: 's2', dayOfWeek: 1, startTime: '08:20', endTime: '09:10', subjectId: '2' },
 ];
+
+interface TemplateSchedule {
+    day: number;
+    start: string;
+    end: string;
+    subjectIndex: number;
+}
+
+interface GradebookTemplate {
+    subjects: Partial<Subject>[];
+    schedule: TemplateSchedule[];
+}
+
+const SLOT_TIMES = [
+    { start: "07:30", end: "08:20" }, // Aula 1
+    { start: "08:20", end: "09:10" }, // Aula 2
+    { start: "09:35", end: "10:25" }, // Aula 3
+    { start: "10:25", end: "11:15" }, // Aula 4
+    { start: "11:25", end: "12:15" }, // Aula 5
+    { start: "12:15", end: "13:05" }, // Aula 6
+    { start: "14:05", end: "14:55" }, // Aula 7
+    { start: "14:55", end: "15:45" }, // Aula 8
+    { start: "16:00", end: "16:50" }, // Aula 9
+    { start: "16:50", end: "17:40" }, // Aula 10
+];
+
+const createSlots = (day: number, indices: number[]) => {
+    return indices.map((subIndex, i) => {
+        if (subIndex === -1) return null;
+        return {
+            day,
+            start: SLOT_TIMES[i].start,
+            end: SLOT_TIMES[i].end,
+            subjectIndex: subIndex
+        };
+    }).filter(s => s !== null) as TemplateSchedule[];
+};
+
+export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTemplate>> = {
+  "INF": {
+    "1": {
+      subjects: [
+        { name: "Filosofia I", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 0
+        { name: "Espanhol", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 1
+        { name: "Arq. Computadores", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 2
+        { name: "Geografia I", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 3
+        { name: "Matemática I", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 4
+        { name: "Química I", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
+        { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 6
+        { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 7
+        { name: "LPLB I", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 8
+        { name: "História I", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 9
+        { name: "Algoritmos", color: "#8b5cf6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 10
+        { name: "Inglês I", color: "#fb7185", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 11
+        { name: "Informática Básica", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
+        { name: "Design Web", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
+        { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
+        { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 15
+        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES } // 16
+      ],
+      schedule: [
+          ...createSlots(1, [0,0, 1,1, 2,2]), // Seg
+          ...createSlots(2, [3,3, 4,4, 5,5, 6,6, 7,7]), // Ter
+          ...createSlots(3, [8,8, 4,4, 9,9, 10,10, 10,10]), // Qua
+          ...createSlots(4, [7,7, 8,8, 11,11, 12,12, 13,13]), // Qui
+          ...createSlots(5, [14,14, 15,15, 16,16, 10,10, 10,10]) // Sex
+      ]
+    },
+    "2": {
+      subjects: [
+        { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 0
+        { name: "LPLB II", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 1
+        { name: "Filosofia II", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 2
+        { name: "Ed. Física II", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 3
+        { name: "Geografia II", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
+        { name: "Desenv. Web I", color: "#d946ef", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
+        { name: "Matemática II", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
+        { name: "Banco de Dados", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 7
+        { name: "Química II", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 8
+        { name: "Sociologia II", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 9
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 10
+        { name: "Biologia II", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 11
+        { name: "PC Web", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
+        { name: "Fund. Redes", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
+        { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
+        { name: "Ed. Artística I", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS } // 15
+      ],
+      schedule: [
+          ...createSlots(1, [0,0, 1,1, 2,2]), // Seg
+          ...createSlots(2, [3,3, 1,1, 4,4, 5,5, 5,5]), // Ter
+          ...createSlots(3, [6,6, 7,7, 8,8, 9,9, 0,0]), // Qua
+          ...createSlots(4, [6,6, 10,10, 11,11, 12,12, 13,13]), // Qui
+          ...createSlots(5, [14,14, 15,15, 11,11, 9,9, 0,0]) // Sex
+      ]
+    },
+    "3": {
+      subjects: [
+        { name: "LPLB III", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 0
+        { name: "Filosofia III", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 1
+        { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 2
+        { name: "PDME", color: "#8b5cf6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 3
+        { name: "Química III", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 4
+        { name: "Matemática III", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
+        { name: "Desenv. Web II", color: "#d946ef", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
+        { name: "Geografia III", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 7
+        { name: "História III", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 8
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 9
+        { name: "Ed. Artística II", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 10
+        { name: "Sociologia III", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 11
+        { name: "Biologia III", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 12
+        { name: "Física III", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
+        { name: "Sist. Operacionais", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES } // 14
+      ],
+      schedule: [
+          ...createSlots(1, [0,0, 1,1, 2,2, 3,3, 3,3]), // Seg
+          ...createSlots(2, [0,0, 4,4, 5,5, 6,6, 6,6]), // Ter
+          ...createSlots(3, [7,7, 8,8, 5,5]), // Qua
+          ...createSlots(4, [9,9, 10,10, 11,11]), // Qui
+          ...createSlots(5, [12,12, 13,13, 14,14]) // Sex
+      ]
+    }
+  },
+  "ADM": {
+    "1": {
+      subjects: [
+        { name: "Filosofia I", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 0
+        { name: "Comp. Org.", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 1
+        { name: "Espanhol", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 2
+        { name: "Matemática I", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 3
+        { name: "Geografia I", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
+        { name: "Química I", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
+        { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 6
+        { name: "Fund. Adm.", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 7
+        { name: "LPLB I", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 8
+        { name: "Int. Inform.", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 9
+        { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 10
+        { name: "História I", color: "#b45309", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 11
+        { name: "Ética RSA", color: "#84cc16", totalClasses: 40, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
+        { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
+        { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES } // 14
+      ],
+      schedule: [
+          ...createSlots(1, [0,0, 1,1, 2,2]), // Seg
+          ...createSlots(2, [3,3, 4,4, 5,5, 6,6, 6,6]), // Ter
+          ...createSlots(3, [7,7, 8,8, 9,9, 10,10, 6,6]), // Qua
+          ...createSlots(4, [8,8, 3,3, 11,11, 11,11, 12,12]), // Qui
+          ...createSlots(5, [6,6, 13,13, 14,14, 10,10, 6,6]) // Sex
+      ]
+    },
+    "2": {
+      subjects: [
+        { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }, // 0
+        { name: "LPLB II", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 1
+        { name: "Filosofia II", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 2
+        { name: "Ed. Física II", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 3
+        { name: "Geografia II", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
+        { name: "Marketing", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 5
+        { name: "Contabilidade", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
+        { name: "Matemática II", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 7
+        { name: "Logística", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 8
+        { name: "Química II", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 9
+        { name: "Sociologia II", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 10
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 11
+        { name: "História II", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
+        { name: "Legisl. Trab.", color: "#f472b6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 13
+        { name: "SIG e OSM", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
+        { name: "Física II", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 15
+        { name: "Ed. Artística I", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 16
+        { name: "Biologia II", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES } // 17
+      ],
+      schedule: [
+          ...createSlots(1, [0,0, 1,1, 2,2]), // Seg
+          ...createSlots(2, [3,3, 1,1, 4,4, 5,5, 6,6]), // Ter
+          ...createSlots(3, [7,7, 8,8, 9,9, 10,10, 0,0]), // Qua
+          ...createSlots(4, [7,7, 11,11, 12,12, 13,13, 14,14]), // Qui
+          ...createSlots(5, [15,15, 16,16, 17,17, 10,10, 0,0]) // Sex
+      ]
+    },
+    "3": {
+      subjects: [
+        { name: "LPLB III", color: "#f43f5e", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 0
+        { name: "Filosofia III", color: "#f59e0b", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 1
+        { name: "Empreend. Inov.", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 2
+        { name: "Gest. Pessoas", color: "#d946ef", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 3
+        { name: "Economia", color: "#10b981", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 4
+        { name: "Química III", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 5
+        { name: "Matemática III", color: "#3b82f6", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 6
+        { name: "APO", color: "#8b5cf6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 7
+        { name: "Adm. Finan. Orç.", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 8
+        { name: "Geografia III", color: "#d97706", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 9
+        { name: "História III", color: "#b45309", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 10
+        { name: "Língua Estrangeira", color: "#ec4899", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.LANGUAGES }, // 11
+        { name: "Ed. Artística II", color: "#db2777", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.ARTS }, // 12
+        { name: "Sociologia III", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 13
+        { name: "Biologia III", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 14
+        { name: "Física III", color: "#6366f1", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 15
+        { name: "Reposição", color: "#9ca3af", totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER } // 16
+      ],
+      schedule: [
+          ...createSlots(1, [0,0, 1,1, 2,2, 3,3, 4,4]), // Seg
+          ...createSlots(2, [0,0, 5,5, 6,6, 7,7, 8,8]), // Ter
+          ...createSlots(3, [9,9, 10,10, 6,6]), // Qua
+          ...createSlots(4, [11,11, 12,12, 13,13]), // Qui
+          ...createSlots(5, [14,14, 15,15, 16,16]) // Sex
+      ]
+    }
+  }
+};
