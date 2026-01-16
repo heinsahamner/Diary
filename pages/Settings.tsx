@@ -87,10 +87,39 @@ export const Settings: React.FC = () => {
   const handlePresetSelect = (course: string, year: string) => {
       const template = PREDEFINED_GRADEBOOKS[course]?.[year];
       if (template) {
-          if (window.confirm(`Isso irá adicionar ${template.subjects.length} matérias e ${template.schedule.length} aulas à sua grade. Deseja continuar?`)) {
+          if (window.confirm(`Isso irá configurar ${template.subjects.length} matérias e ${template.schedule.length} aulas na sua grade. As matérias 'Reposição' e 'Horário Vago' serão atualizadas. Deseja continuar?`)) {              
               
-              const createdSubjectIds: string[] = [];
+            const createdSubjectIds: string[] = [];
               template.subjects.forEach((t, index) => {
+
+                  if (t.name === 'Reposição') {
+                      createdSubjectIds.push('reposicao');
+                      updateSubject({
+                          id: 'reposicao',
+                          name: t.name,
+                          color: t.color || '#9ca3af',
+                          totalClasses: t.totalClasses || 0,
+                          type: t.type || SubjectType.ORGANIZATIONAL,
+                          category: t.category || SubjectCategory.OTHER,
+                          gradingMethod: undefined
+                      });
+                      return; 
+                  }
+                  
+                  if (t.name === 'Horário Vago' || t.name === 'Vago') {
+                      createdSubjectIds.push('vago');
+                      updateSubject({
+                          id: 'vago',
+                          name: t.name || 'Horário Vago',
+                          color: t.color || '#9ca3af',
+                          totalClasses: 0,
+                          type: SubjectType.ORGANIZATIONAL,
+                          category: SubjectCategory.OTHER,
+                          gradingMethod: undefined
+                      });
+                      return;
+                  }
+
                   const newId = Date.now().toString() + index;
                   createdSubjectIds.push(newId);
                   
