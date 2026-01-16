@@ -17,8 +17,8 @@ export enum SubjectCategory {
 export enum ClassStatus {
   PRESENT = 'Present',
   ABSENT = 'Absent',
-  CANCELED = 'Canceled', 
-  SUBSTITUTED = 'Substituted', 
+  CANCELED = 'Canceled',
+  SUBSTITUTED = 'Substituted',
 }
 
 export enum TaskType {
@@ -30,16 +30,19 @@ export enum TaskType {
 
 export enum TaskStatus {
   PENDING = 'Pendente',
+  IN_PROGRESS = 'Em Andamento',
   COMPLETED = 'Concluído',
   LATE = 'Atrasado',
 }
+
+export type TaskPriority = 'low' | 'medium' | 'high';
 
 export interface Subject {
   id: string;
   name: string;
   color: string;
   teacher?: string;
-  totalClasses: number; 
+  totalClasses: number;
   type: SubjectType;
   category?: SubjectCategory;
   gradingMethod?: GradingSystem;
@@ -47,7 +50,7 @@ export interface Subject {
 
 export interface ScheduleSlot {
   id: string;
-  dayOfWeek: number; 
+  dayOfWeek: number;
   startTime: string;
   endTime: string;
   subjectId: string;
@@ -60,6 +63,7 @@ export interface ClassLog {
   originalSubjectId: string;
   actualSubjectId: string; 
   status: ClassStatus;
+  note?: string; 
 }
 
 export interface DayValidation {
@@ -78,6 +82,12 @@ export interface Assessment {
   isExtra?: boolean; 
 }
 
+export interface Subtask {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -86,7 +96,11 @@ export interface Task {
   value?: number;
   type: TaskType;
   status: TaskStatus;
-  members?: string; 
+  priority: TaskPriority; 
+  members?: string;
+  description?: string; 
+  subtasks?: Subtask[]; 
+  timeSpent?: number;
 }
 
 export type GradeCalcMethod = 'running' | 'absolute';
@@ -95,10 +109,11 @@ export type GradingSystem = 'average' | 'sum' | 'manual';
 export interface SystemSettings {
   totalSchoolDays: number; 
   darkMode: boolean;
+  compactMode: boolean; 
   notificationsEnabled: boolean;
-  passingGrade: number; 
-  gradeCalcMethod: GradeCalcMethod;
-  gradingSystem: GradingSystem;
+  passingGrade: number;
+  gradeCalcMethod: GradeCalcMethod; 
+  gradingSystem: GradingSystem; 
   currentYear: number;
 }
 
@@ -122,6 +137,7 @@ export interface AppContextType extends AppState {
   logClass: (log: ClassLog) => void;
   addAssessment: (a: Assessment) => void;
   removeAssessment: (id: string) => void;
+  updateAssessment: (a: Assessment) => void;
   addTask: (t: Task) => void;
   updateTask: (t: Task) => void;
   deleteTask: (id: string) => void;

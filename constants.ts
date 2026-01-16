@@ -44,7 +44,7 @@ const SLOT_TIMES = [
 
 const createSlots = (day: number, indices: number[]) => {
     return indices.map((subIndex, i) => {
-        if (subIndex === -1) return null; 
+        if (subIndex === -1) return null;
         return {
             day,
             start: SLOT_TIMES[i].start,

@@ -63,23 +63,19 @@ export const DBService = {
      return backup;
   },
   
-  // Isso simula enviar para um servidor
-  // Placeholder no momento
   async uploadBackupToServer(username: string, serverUrl: string): Promise<boolean> {
       try {
           const data = await this.getAllDataForUser(username);
           
-          // NOTA: Aqui é onde se conecta com a API de backend do MariaDB
+          // NOTA: Aqui deve se conectar ao backend MariaDB
           /*
-
           const response = await fetch(serverUrl, {
           method: 'POST',
 
           headers: { 'Content-Type': 'application/json' },
 
-          body: JSON.stringify({ username, data, timestamp: new Date().toISOString() })
-
-          });
+          ody: JSON.stringify({ username, data, timestamp: new Date().toISOString() })
+          );
 
           if (!response.ok) throw new Error('Falha ao fazer o upload');
 
