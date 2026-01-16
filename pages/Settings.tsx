@@ -472,7 +472,7 @@ export const Settings: React.FC = () => {
                   <a href="https://microspace.forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                              <Atomics size={20} />
+                              <Globe size={20} />
                           </div>
                           <span className="font-medium text-gray-700 dark:text-gray-200">Microspace</span>
                       </div>
