@@ -39,57 +39,57 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 capitalize">Olá, Estudante</h1>
-        <p className="text-gray-500 mt-1 capitalize">{formattedDate}</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white capitalize">Olá, Estudante</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1 capitalize">{formattedDate}</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Widget de Status */}
-        <div className={`p-5 rounded-2xl border ${isDayValidated ? 'bg-green-50 border-green-100' : 'bg-orange-50 border-orange-100'}`}>
+        <div className={`p-5 rounded-2xl border ${isDayValidated ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800' : 'bg-orange-50 dark:bg-orange-900/20 border-orange-100 dark:border-orange-800'}`}>
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium opacity-80 mb-1">Status do Dia</p>
-              <h3 className={`text-lg font-bold ${isDayValidated ? 'text-green-700' : 'text-orange-700'}`}>
+              <p className="text-sm font-medium opacity-80 mb-1 text-gray-600 dark:text-gray-300">Status do Dia</p>
+              <h3 className={`text-lg font-bold ${isDayValidated ? 'text-green-700 dark:text-green-400' : 'text-orange-700 dark:text-orange-400'}`}>
                 {isDayValidated ? 'Validado' : 'Ação Pendente'}
               </h3>
             </div>
-            <div className={`p-2 rounded-full ${isDayValidated ? 'bg-green-200 text-green-700' : 'bg-orange-200 text-orange-700'}`}>
+            <div className={`p-2 rounded-full ${isDayValidated ? 'bg-green-200 dark:bg-green-900/50 text-green-700 dark:text-green-400' : 'bg-orange-200 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400'}`}>
               <CalendarCheck size={20} />
             </div>
           </div>
           {!isDayValidated && (
-             <Link to="/diary" className="mt-4 text-xs font-bold text-orange-600 hover:underline block">
+             <Link to="/diary" className="mt-4 text-xs font-bold text-orange-600 dark:text-orange-400 hover:underline block">
                Ir para o Diário &rarr;
              </Link>
           )}
         </div>
 
         {/* Widget de Próxima aula */}
-        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm">
+        <div className="p-5 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
            <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Próxima Aula</p>
-              <h3 className="text-lg font-bold text-gray-900 truncate">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Próxima Aula</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
                 {nextClass ? nextClass.subject?.name : 'Sem aulas agora'}
               </h3>
               <p className="text-xs text-gray-400 mt-1">{nextClass ? nextClass.slot.startTime : '--:--'}</p>
             </div>
-            <div className="p-2 rounded-full bg-indigo-50 text-indigo-600">
+            <div className="p-2 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
               <Clock size={20} />
             </div>
           </div>
         </div>
 
          {/* Prévia das Tarefas */}
-         <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm">
+         <div className="p-5 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
            <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Para Entregar</p>
-              <h3 className="text-lg font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Para Entregar</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                 {urgentTasks.length} Urgentes
               </h3>
             </div>
-            <div className="p-2 rounded-full bg-purple-50 text-purple-600">
+            <div className="p-2 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
               <AlertCircle size={20} />
             </div>
           </div>
@@ -98,9 +98,9 @@ export const Dashboard: React.FC = () => {
 
       {/* Lista de tarefas urgentes */}
       <section className="mt-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Tarefas Urgentes</h2>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Tarefas Urgentes</h2>
         {urgentTasks.length === 0 ? (
-          <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+          <div className="p-8 text-center bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
             <p className="text-gray-400">Nenhuma tarefa urgente. Relaxe! 🌴</p>
           </div>
         ) : (
@@ -108,16 +108,16 @@ export const Dashboard: React.FC = () => {
              {urgentTasks.map(task => {
                const sub = subjects.find(s => s.id === task.subjectId);
                return (
-                 <div key={task.id} className="flex items-center p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
+                 <div key={task.id} className="flex items-center p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold mr-4 shrink-0"
                          style={{ backgroundColor: sub?.color || '#ccc' }}>
                         {sub?.name.substring(0,2).toUpperCase()}
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800">{task.title}</h4>
-                      <p className="text-xs text-red-500 font-medium">Entrega: {format(new Date(task.dueDate), "d 'de' MMM", { locale: ptBR })}</p>
+                      <h4 className="font-semibold text-gray-800 dark:text-white">{task.title}</h4>
+                      <p className="text-xs text-red-500 dark:text-red-400 font-medium">Entrega: {format(new Date(task.dueDate), "d 'de' MMM", { locale: ptBR })}</p>
                     </div>
-                    <span className="text-xs px-2 py-1 bg-gray-100 rounded text-gray-600">
+                    <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
                       {task.type}
                     </span>
                  </div>

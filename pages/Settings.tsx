@@ -566,7 +566,7 @@ export const Settings: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm max-w-2xl mx-auto text-center space-y-8">
               <div>
                   <h2 className="text-3xl font-bold text-indigo-600 dark:text-purple-400 mb-2">Diary</h2>
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">um aplicativo Microspace</p>
+                  <p className="text-gray-500 dark:text-gray-400 font-medium">um aplicativo Microspace<br>v1.2.1</br></p>
               </div>
 
               <div className="bg-indigo-50 dark:bg-purple-900/10 p-4 rounded-xl inline-block">
