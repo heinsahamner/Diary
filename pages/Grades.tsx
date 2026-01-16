@@ -1,27 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStore } from '../services/store';
 import { TRIMESTERS } from '../constants';
-import { Plus, Trash2, Calculator, Star } from 'lucide-react';
-import { Assessment, SubjectType, GradingSystem } from '../types';
+import { Plus, Trash2, Calculator, Star, TrendingUp, GraduationCap, AlertTriangle, BookOpen, Target, X, LayoutGrid, List, Pencil, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Assessment, SubjectType, GradingSystem, Subject, ClassStatus } from '../types';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | undefined, trimester: number | null, method: 'running' | 'absolute', globalGradingSystem: GradingSystem) => {
     if (!subject) return 0;
-
     const gradingSystem = subject.gradingMethod || globalGradingSystem;
 
     if (trimester === null) {
         let sumAverages = 0;
         let countTrimesters = 0;
-        
         TRIMESTERS.forEach(t => {
              const tAvg = calculateSubjectAverage(assessments, subject, t, method, globalGradingSystem);
-             if (tAvg > 0 || assessments.some(a => a.subjectId === subject.id && a.trimester === t)) {
+             const hasAssessments = assessments.some(a => a.subjectId === subject.id && a.trimester === t);
+             if (tAvg > 0 || hasAssessments) {
                  sumAverages += tAvg;
                  countTrimesters++;
              }
         });
-
+        
         if (countTrimesters === 0) return 0;
+        
         if (method === 'absolute') return Math.min(10, sumAverages / 3);
         return Math.min(10, sumAverages / countTrimesters);
     }
@@ -30,69 +31,120 @@ const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | u
     if (filtered.length === 0) return 0;
 
     let result = 0;
-
     if (gradingSystem === 'manual') {
         result = filtered.reduce((acc, curr) => acc + curr.value, 0);
-    }
-    else if (gradingSystem === 'sum') {
+    } else if (gradingSystem === 'sum') {
         const baseSum = filtered.filter(a => !a.isExtra).reduce((acc, curr) => acc + curr.value, 0);
         const extraSum = filtered.filter(a => a.isExtra).reduce((acc, curr) => acc + curr.value, 0);
         result = baseSum + extraSum;
-    }
-    else {
-        const normalAssessments = filtered.filter(a => !a.isExtra);
-        const extraAssessments = filtered.filter(a => a.isExtra);
-        
+    } else {
+        const normal = filtered.filter(a => !a.isExtra);
+        const extra = filtered.filter(a => a.isExtra);
         let totalWeight = 0;
         let weightedSum = 0;
-        
-        normalAssessments.forEach(a => {
+        normal.forEach(a => {
             weightedSum += (a.value * a.weight);
             totalWeight += a.weight;
         });
-        
         const baseAvg = totalWeight === 0 ? 0 : weightedSum / totalWeight;
-        const extraPoints = extraAssessments.reduce((acc, curr) => acc + curr.value, 0);
-        
+        const extraPoints = extra.reduce((acc, curr) => acc + curr.value, 0);
         result = baseAvg + extraPoints;
     }
-    
     return Math.min(10, Math.max(0, result));
 };
 
 export const Grades: React.FC = () => {
-  const { subjects, assessments, addAssessment, removeAssessment, settings } = useStore();
-  const [activeTab, setActiveTab] = useState<'details' | 'overview'>('details');
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>(subjects[0]?.id || '');
-  const [selectedTrimester, setSelectedTrimester] = useState<number>(1);
+  const { subjects, assessments, addAssessment, removeAssessment, updateAssessment, settings, logs, schedule, validations } = useStore();
   
+  const [viewMode, setViewMode] = useState<'overview' | 'detail'>('overview');
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>(subjects.find(s => s.type === SubjectType.NORMAL)?.id || '');
+  const [activeTrimester, setActiveTrimester] = useState<number>(1);
+  const [showSimulator, setShowSimulator] = useState(false);
+  const [targetGrade, setTargetGrade] = useState(settings.passingGrade);
+
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newValue, setNewValue] = useState('');
   const [newWeight, setNewWeight] = useState('1');
   const [isExtra, setIsExtra] = useState(false);
 
+  
+  const reportCard = useMemo(() => {
+      return subjects
+        .filter(s => s.type === SubjectType.NORMAL)
+        .map(sub => {
+            const t1 = calculateSubjectAverage(assessments, sub, 1, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+            const t2 = calculateSubjectAverage(assessments, sub, 2, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+            const t3 = calculateSubjectAverage(assessments, sub, 3, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+            const final = calculateSubjectAverage(assessments, sub, null, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+
+            const subjectLogs = logs.filter(l => l.actualSubjectId === sub.id && l.status !== ClassStatus.CANCELED);
+            const absences = subjectLogs.filter(l => l.status === ClassStatus.ABSENT).length;
+            
+            let classesHeld = 0;
+            validations.forEach(v => {
+                const d = new Date(v.date + 'T00:00:00').getDay();
+                const slots = schedule.filter(s => s.dayOfWeek === d && s.subjectId === sub.id);
+                classesHeld += slots.length;
+            });
+            if (classesHeld === 0) classesHeld = Math.max(1, subjectLogs.length);
+            
+            const attendance = classesHeld > 0 ? ((classesHeld - absences) / classesHeld) * 100 : 100;
+
+            return { subject: sub, t1, t2, t3, final, attendance, absences };
+        });
+  }, [subjects, assessments, logs, validations, schedule, settings]);
+
   const currentSubject = subjects.find(s => s.id === selectedSubjectId);
   const activeGradingSystem = currentSubject?.gradingMethod || settings.gradingSystem || 'average';
-  const subjectAssessments = assessments.filter(a => 
-    a.subjectId === selectedSubjectId && a.trimester === selectedTrimester
-  );
+  
+  const subjectAssessments = useMemo(() => {
+      return assessments.filter(a => a.subjectId === selectedSubjectId && a.trimester === activeTrimester);
+  }, [assessments, selectedSubjectId, activeTrimester]);
 
-  const currentTrimesterAvg = calculateSubjectAverage(assessments, currentSubject, selectedTrimester, settings.gradeCalcMethod, settings.gradingSystem || 'average');
+  const stats = useMemo(() => {
+      if (!currentSubject) return { t1: 0, t2: 0, t3: 0, final: 0, attendance: 100, trend: [], absences: 0 };
+      const data = reportCard.find(r => r.subject.id === currentSubject.id);
+      if (!data) return { t1: 0, t2: 0, t3: 0, final: 0, attendance: 100, trend: [], absences: 0 };
 
-  const handleAdd = (e: React.FormEvent) => {
+      const trend = [
+          { name: 'T1', score: data.t1 },
+          { name: 'T2', score: data.t2 },
+          { name: 'T3', score: data.t3 },
+      ];
+      return { ...data, trend, classesHeld: 0 }; 
+  }, [currentSubject, reportCard]);
+
+  const openForm = (assessment?: Assessment) => {
+      if (assessment) {
+          setEditingId(assessment.id);
+          setNewName(assessment.name);
+          setNewValue(assessment.value.toString());
+          setNewWeight(assessment.weight.toString());
+          setIsExtra(assessment.isExtra || false);
+      } else {
+          setEditingId(null);
+          setNewName('');
+          setNewValue('');
+          setNewWeight('1');
+          setIsExtra(false);
+      }
+      setIsFormOpen(true);
+  };
+
+  const handleSaveAssessment = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newName || !newValue) return;
-    
     let val = parseFloat(newValue);
     if (isNaN(val)) return;
-    
     if (val < 0) val = 0;
     if (val > 10) val = 10; 
 
-    const assessment: Assessment = {
-      id: Date.now().toString(),
+    const newAssessment: Assessment = {
+      id: editingId || Date.now().toString(),
       subjectId: selectedSubjectId,
-      trimester: selectedTrimester as 1|2|3,
+      trimester: activeTrimester as 1|2|3,
       name: newName,
       value: val,
       weight: parseFloat(newWeight) || 1,
@@ -100,260 +152,410 @@ export const Grades: React.FC = () => {
       isExtra: isExtra
     };
 
-    addAssessment(assessment);
+    if (editingId) {
+        updateAssessment(newAssessment);
+    } else {
+        addAssessment(newAssessment);
+    }
+
     setNewName('');
     setNewValue('');
     setIsExtra(false);
+    setIsFormOpen(false);
+    setEditingId(null);
   };
 
-  const neededScore = (() => {
-     if (settings.gradeCalcMethod !== 'absolute') return null;
-     if (!currentSubject) return null;
-     
-     let currentSum = 0;
-     let passedTrimesters = 0;
-     TRIMESTERS.forEach(t => {
-         const hasAssessments = assessments.some(a => a.subjectId === selectedSubjectId && a.trimester === t);
-         if (hasAssessments) {
-             currentSum += calculateSubjectAverage(assessments, currentSubject, t, 'absolute', settings.gradingSystem || 'average');
-             passedTrimesters++;
-         }
-     });
+  const handleSubjectSelect = (id: string) => {
+      setSelectedSubjectId(id);
+      setViewMode('detail');
+  };
 
-     const totalNeeded = settings.passingGrade * 3;
-     const remainingScore = totalNeeded - currentSum;
-     const remainingTrimesters = 3 - passedTrimesters;
+  const simulationResult = useMemo(() => {
+      if(!currentSubject) return null;
+      
+      const t1 = stats.t1 || 0;
+      const t2 = stats.t2 || 0;
+      const t3 = stats.t3 || 0;
+      
+      const hasT1 = assessments.some(a => a.subjectId === selectedSubjectId && a.trimester === 1);
+      const hasT2 = assessments.some(a => a.subjectId === selectedSubjectId && a.trimester === 2);
+      const hasT3 = assessments.some(a => a.subjectId === selectedSubjectId && a.trimester === 3);
 
-     if (remainingTrimesters <= 0) return null;
-     
-     const neededPerTri = remainingScore / remainingTrimesters;
-     return Math.max(0, neededPerTri).toFixed(1);
-  })();
+      let missingCount = 0;
+      if (!hasT1) missingCount++;
+      if (!hasT2) missingCount++;
+      if (!hasT3) missingCount++;
+
+      if (missingCount === 0) return null;
+
+      const currentSum = t1 + t2 + t3; 
+      const totalNeeded = targetGrade * 3;
+      const neededPoints = totalNeeded - currentSum;
+      
+      const neededPerTrim = neededPoints / missingCount;
+      return neededPerTrim > 0 ? neededPerTrim.toFixed(1) : 0;
+  }, [stats, targetGrade, assessments, selectedSubjectId, currentSubject]);
+
 
   return (
-    <div className="space-y-4 pb-10">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-2">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Notas e Avaliações</h1>
-        <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex">
-            <button 
-                onClick={() => setActiveTab('details')}
-                className={`px-4 py-1.5 rounded-md font-bold text-sm transition-all ${activeTab === 'details' ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
-            >
-                Lançamentos
-            </button>
-            <button 
-                onClick={() => setActiveTab('overview')}
-                className={`px-4 py-1.5 rounded-md font-bold text-sm transition-all ${activeTab === 'overview' ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-purple-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
-            >
-                Visão Geral
-            </button>
-        </div>
+    <div className="pb-20 space-y-6">
+      <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Boletim Escolar</h1>
+          <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl">
+              <button 
+                onClick={() => setViewMode('overview')}
+                className={`p-2 rounded-lg transition-all ${viewMode === 'overview' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+                title="Visão Geral"
+              >
+                  <LayoutGrid size={20} />
+              </button>
+              <button 
+                onClick={() => setViewMode('detail')}
+                className={`p-2 rounded-lg transition-all ${viewMode === 'detail' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+                title="Detalhes"
+              >
+                  <List size={20} />
+              </button>
+          </div>
       </div>
 
-      {activeTab === 'details' && (
-      <>
-        <div className="flex space-x-2 bg-white dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-x-auto max-w-full">
-           {subjects.length === 0 ? (
-               <div className="p-2 text-sm text-gray-500 italic">Cadastre matérias nos Ajustes para começar.</div>
-           ) : (
-            subjects.filter(s => s.type === SubjectType.NORMAL).map(sub => (
-             <button
-                key={sub.id}
-                onClick={() => setSelectedSubjectId(sub.id)}
-                className={`px-3 py-1 text-sm rounded-md transition-colors whitespace-nowrap ${
-                    selectedSubjectId === sub.id 
-                    ? 'bg-indigo-600 dark:bg-purple-600 text-white shadow' 
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-             >
-                {sub.name}
-             </button>
-            ))
-           )}
-        </div>
+      {viewMode === 'overview' && (
+          <div className="animate-fade-in">
+              {reportCard.length === 0 ? (
+                  <div className="text-center py-20 bg-gray-50 dark:bg-gray-800 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
+                      <p className="text-gray-500">Nenhuma matéria cadastrada.</p>
+                  </div>
+              ) : (
+                  <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                      <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                              <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
+                                  <tr>
+                                      <th className="px-6 py-4 text-left">Matéria</th>
+                                      <th className="px-4 py-4 text-center">T1</th>
+                                      <th className="px-4 py-4 text-center">T2</th>
+                                      <th className="px-4 py-4 text-center">T3</th>
+                                      <th className="px-6 py-4 text-center text-indigo-600 dark:text-purple-400">Final</th>
+                                      <th className="px-6 py-4 text-center">Freq.</th>
+                                      <th className="px-4 py-4"></th>
+                                  </tr>
+                              </thead>
+                              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                  {reportCard.map((row) => (
+                                      <tr 
+                                        key={row.subject.id} 
+                                        onClick={() => handleSubjectSelect(row.subject.id)}
+                                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors group"
+                                      >
+                                          <td className="px-6 py-4">
+                                              <div className="flex items-center gap-3">
+                                                  <div className="w-3 h-3 rounded-full flex-shrink-0" style={{backgroundColor: row.subject.color}} />
+                                                  <span className="font-bold text-gray-800 dark:text-white">{row.subject.name}</span>
+                                              </div>
+                                          </td>
+                                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-300">
+                                              {row.t1 > 0 ? row.t1.toFixed(1) : '-'}
+                                          </td>
+                                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-300">
+                                              {row.t2 > 0 ? row.t2.toFixed(1) : '-'}
+                                          </td>
+                                          <td className="px-4 py-4 text-center text-gray-600 dark:text-gray-300">
+                                              {row.t3 > 0 ? row.t3.toFixed(1) : '-'}
+                                          </td>
+                                          <td className="px-6 py-4 text-center">
+                                              <span className={`font-bold px-2 py-1 rounded-lg ${
+                                                  row.final < settings.passingGrade 
+                                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' 
+                                                  : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                                              }`}>
+                                                  {row.final.toFixed(1)}
+                                              </span>
+                                          </td>
+                                          <td className="px-6 py-4 text-center">
+                                              <div className="flex flex-col items-center">
+                                                  <span className={`font-bold ${row.attendance < 75 ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}`}>
+                                                      {Math.round(row.attendance)}%
+                                                  </span>
+                                                  <div className="w-16 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-1 overflow-hidden">
+                                                      <div 
+                                                        className={`h-full rounded-full ${row.attendance < 75 ? 'bg-red-500' : 'bg-green-500'}`}
+                                                        style={{width: `${row.attendance}%`}}
+                                                      />
+                                                  </div>
+                                              </div>
+                                          </td>
+                                          <td className="px-4 py-4 text-right">
+                                              <ChevronRight className="text-gray-300 group-hover:text-indigo-500 transition-colors" size={20} />
+                                          </td>
+                                      </tr>
+                                  ))}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              )}
+          </div>
+      )}
 
-        {subjects.length > 0 && currentSubject && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Coluna Esquerda: input e seleção do trimestre */}
-            <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-                {/* Abas dos trimestres */}
-                <div className="flex space-x-4 border-b border-gray-100 dark:border-gray-700 pb-4 mb-4 overflow-x-auto">
+      {viewMode === 'detail' && currentSubject && (
+        <div className="animate-fade-in space-y-6">
+            
+            <div className="flex space-x-2 overflow-x-auto no-scrollbar pb-2">
+                {subjects.filter(s => s.type === SubjectType.NORMAL).map(sub => (
+                    <button
+                        key={sub.id}
+                        onClick={() => setSelectedSubjectId(sub.id)}
+                        className={`
+                            flex items-center space-x-2 px-4 py-2 rounded-xl border transition-all whitespace-nowrap flex-shrink-0
+                            ${selectedSubjectId === sub.id 
+                            ? 'bg-indigo-600 dark:bg-purple-600 border-indigo-600 dark:border-purple-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none scale-105' 
+                            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}
+                        `}
+                    >
+                        <div className="w-2 h-2 rounded-full bg-white" style={{backgroundColor: selectedSubjectId === sub.id ? 'white' : sub.color}} />
+                        <span className="font-bold text-sm">{sub.name}</span>
+                    </button>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 dark:bg-purple-900/20 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                    <div className="relative z-10">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm font-bold uppercase tracking-wider mb-1">Média Anual</p>
+                        <div className="flex items-baseline gap-2">
+                            <span className={`text-5xl font-bold ${stats.final < settings.passingGrade ? 'text-red-500' : 'text-gray-800 dark:text-white'}`}>
+                                {stats.final.toFixed(1)}
+                            </span>
+                            <span className="text-gray-400 text-sm">/ 10</span>
+                        </div>
+                        {stats.final < settings.passingGrade && (
+                            <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-lg">
+                                <AlertTriangle size={12} /> Abaixo da média
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="md:col-span-2 grid grid-cols-2 gap-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
+                                <GraduationCap size={18} />
+                            </div>
+                            <span className="text-sm font-bold text-gray-500 dark:text-gray-400">Presença</span>
+                        </div>
+                        <div className="text-2xl font-bold text-gray-800 dark:text-white mb-1">
+                            {stats.attendance.toFixed(0)}%
+                        </div>
+                        <div className="text-xs text-gray-400">
+                            {stats.absences} faltas registradas
+                        </div>
+                    </div>
+
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-1 border border-gray-200 dark:border-gray-700 shadow-sm relative overflow-hidden">
+                        <p className="absolute top-4 left-4 text-xs font-bold text-gray-400 z-10">Evolução</p>
+                        <div className="w-full h-full pt-6">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={stats.trend}>
+                                    <defs>
+                                        <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="name" hide />
+                                    <YAxis domain={[0, 10]} hide />
+                                    <Tooltip 
+                                        contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                                        itemStyle={{color: '#4f46e5', fontWeight: 'bold'}}
+                                    />
+                                    <Area type="monotone" dataKey="score" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                <div className="flex border-b border-gray-100 dark:border-gray-700">
                     {TRIMESTERS.map(t => (
                         <button
                             key={t}
-                            onClick={() => setSelectedTrimester(t)}
-                            className={`pb-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                                selectedTrimester === t 
-                                ? 'border-indigo-600 dark:border-purple-500 text-indigo-600 dark:text-purple-400' 
-                                : 'border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+                            onClick={() => setActiveTrimester(t)}
+                            className={`flex-1 py-4 text-sm font-bold transition-colors relative ${
+                                activeTrimester === t 
+                                ? 'text-indigo-600 dark:text-purple-400 bg-indigo-50/50 dark:bg-gray-700/50' 
+                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
                             }`}
                         >
                             {t}º Trimestre
+                            {activeTrimester === t && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-purple-500"></div>}
                         </button>
                     ))}
                 </div>
 
-                {/* Lista */}
-                <div className="space-y-3 mb-6">
-                    {subjectAssessments.length === 0 ? (
-                        <p className="text-center text-gray-400 text-sm py-4">Nenhuma nota lançada neste período.</p>
-                    ) : (
-                        subjectAssessments.map(a => (
-                            <div key={a.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <p className="font-medium text-gray-800 dark:text-white">{a.name}</p>
-                                        {a.isExtra && <span className="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 rounded-full font-bold">Extra</span>}
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-white">Avaliações</h3>
+                            <p className="text-xs text-gray-400">
+                                {activeGradingSystem === 'average' ? 'Média Ponderada' : activeGradingSystem === 'sum' ? 'Somatória' : 'Manual'}
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-sm text-gray-400 mr-2">Média do Trimestre</span>
+                            <span className={`text-2xl font-bold ${(stats as any)[`t${activeTrimester}`] < settings.passingGrade ? 'text-red-500' : 'text-green-500'}`}>
+                                {(stats as any)[`t${activeTrimester}`].toFixed(1)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                        {subjectAssessments.length === 0 ? (
+                            <div className="text-center py-10 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
+                                <BookOpen className="mx-auto text-gray-300 mb-2" size={32} />
+                                <p className="text-gray-400 text-sm">Nenhuma nota lançada.</p>
+                                <button onClick={() => openForm()} className="mt-4 text-indigo-600 dark:text-purple-400 font-bold text-sm hover:underline">
+                                    Adicionar primeira nota
+                                </button>
+                            </div>
+                        ) : (
+                            subjectAssessments.map(a => (
+                                <div 
+                                    key={a.id} 
+                                    onClick={() => openForm(a)}
+                                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-purple-800 transition-colors group cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${a.value >= settings.passingGrade ? 'bg-green-400' : 'bg-red-400'}`}>
+                                            {a.value}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                                {a.name}
+                                                {a.isExtra && <Star size={12} className="text-yellow-500 fill-yellow-500" />}
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                {activeGradingSystem === 'average' && !a.isExtra ? `Peso ${a.weight}` : 'Ponto Extra'}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {activeGradingSystem === 'average' && !a.isExtra ? `Peso: ${a.weight}` : 
-                                         activeGradingSystem === 'sum' ? 'Pontos somados' : ''}
-                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <Pencil size={16} className="text-gray-300 group-hover:text-indigo-500 transition-colors" />
+                                    </div>
                                 </div>
-                                <div className="flex items-center space-x-4">
-                                    <span className={`text-lg font-bold ${a.value < settings.passingGrade ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-                                        {a.value.toFixed(1)}
-                                    </span>
-                                    <button onClick={() => removeAssessment(a.id)} className="text-gray-400 hover:text-red-500 transition-colors">
-                                        <Trash2 size={16} />
+                            ))
+                        )}
+                    </div>
+
+                    {isFormOpen ? (
+                        <form onSubmit={handleSaveAssessment} className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-2xl border border-gray-200 dark:border-gray-600 animate-scale-in">
+                            <div className="flex justify-between mb-4">
+                                <h4 className="text-sm font-bold text-gray-700 dark:text-gray-200">{editingId ? 'Editar Nota' : 'Nova Nota'}</h4>
+                                <button type="button" onClick={() => {setIsFormOpen(false); setEditingId(null);}}><X size={18} className="text-gray-400" /></button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                                <input 
+                                    type="text" placeholder="Nome (Ex: Prova 1)" 
+                                    className="md:col-span-2 p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                                    value={newName} onChange={e => setNewName(e.target.value)} autoFocus
+                                />
+                                <div className="relative">
+                                    <input 
+                                        type="number" step="0.1" placeholder="Nota"
+                                        className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm outline-none no-spinner"
+                                        value={newValue} onChange={e => setNewValue(e.target.value)}
+                                    />
+                                    <span className="absolute right-2 top-2 text-[10px] text-gray-400 pointer-events-none">/10</span>
+                                </div>
+                                {activeGradingSystem === 'average' && !isExtra && (
+                                    <input 
+                                        type="number" step="0.1" placeholder="Peso"
+                                        className="w-full p-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm outline-none no-spinner"
+                                        value={newWeight} onChange={e => setNewWeight(e.target.value)}
+                                    />
+                                )}
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer">
+                                    <input type="checkbox" checked={isExtra} onChange={e => setIsExtra(e.target.checked)} className="rounded text-indigo-600 focus:ring-indigo-500" />
+                                    É ponto extra?
+                                </label>
+                                <div className="flex gap-2">
+                                    {editingId && (
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { removeAssessment(editingId); setIsFormOpen(false); setEditingId(null); }}
+                                            className="px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl text-sm font-bold"
+                                        >
+                                            Excluir
+                                        </button>
+                                    )}
+                                    <button type="submit" className="bg-indigo-600 dark:bg-purple-600 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-indigo-700">
+                                        Salvar
                                     </button>
                                 </div>
                             </div>
-                        ))
+                        </form>
+                    ) : (
+                        <button 
+                            onClick={() => openForm()}
+                            className="w-full py-3 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-gray-400 font-bold hover:border-indigo-400 hover:text-indigo-500 dark:hover:border-purple-500 dark:hover:text-purple-400 transition-all flex items-center justify-center gap-2"
+                        >
+                            <Plus size={20} /> Adicionar Nota
+                        </button>
                     )}
                 </div>
+            </div>
 
-                {/* Adicionar */}
-                <form onSubmit={handleAdd} className="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <input 
-                        type="text" 
-                        placeholder="Nome (Ex: Prova)" 
-                        className="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
-                        value={newName}
-                        onChange={e => setNewName(e.target.value)}
-                        required
-                    />
-                    <div className="flex gap-2">
-                        <div className="relative">
-                            <input 
-                                type="number" 
-                                placeholder="Nota" 
-                                step="0.1"
-                                min="0" max="10"
-                                className="w-20 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none no-spinner"
-                                value={newValue}
-                                onChange={e => setNewValue(e.target.value)}
-                                required
-                            />
-                            <span className="absolute right-1 top-2 text-[10px] text-gray-400 pointer-events-none">0-10</span>
+            <div className="mt-8">
+                <button 
+                    onClick={() => setShowSimulator(!showSimulator)}
+                    className="flex items-center gap-2 text-indigo-600 dark:text-purple-400 font-bold text-sm hover:underline mb-4"
+                >
+                    <Calculator size={16} />
+                    {showSimulator ? 'Ocultar Simulador' : 'Simular Notas Futuras'}
+                </button>
+                
+                {showSimulator && (
+                    <div className="bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-900/10 p-6 rounded-3xl border border-orange-200 dark:border-orange-800/50 animate-fade-in">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div>
+                                <h4 className="font-bold text-orange-800 dark:text-orange-200 flex items-center gap-2">
+                                    <Target size={20} />
+                                    Objetivo Final
+                                </h4>
+                                <p className="text-sm text-orange-600 dark:text-orange-300 mt-1">
+                                    Quanto você quer tirar de média anual?
+                                </p>
+                                <div className="mt-3 flex items-center gap-3">
+                                    <input 
+                                        type="range" min="0" max="10" step="0.5"
+                                        value={targetGrade} onChange={e => setTargetGrade(Number(e.target.value))}
+                                        className="w-48 accent-orange-500"
+                                    />
+                                    <span className="font-bold text-xl text-orange-700 dark:text-orange-100">{targetGrade}</span>
+                                </div>
+                            </div>
+
+                            <div className="text-right">
+                                {simulationResult !== null ? (
+                                    <>
+                                        <p className="text-sm text-orange-600 dark:text-orange-300">Você precisa de média</p>
+                                        <p className="text-4xl font-bold text-orange-600 dark:text-orange-400">{simulationResult}</p>
+                                        <p className="text-xs text-orange-500">nos próximos trimestres</p>
+                                    </>
+                                ) : (
+                                    <p className="text-sm font-bold text-green-600">Todas as notas já foram lançadas!</p>
+                                )}
+                            </div>
                         </div>
-                         
-                         {/* Mostrar peso apenas se for média e não forem pontos extras */}
-                         {activeGradingSystem === 'average' && !isExtra && (
-                             <div className="relative">
-                                <input 
-                                    type="number" 
-                                    placeholder="Peso" 
-                                    step="0.1"
-                                    className="w-16 p-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none no-spinner"
-                                    value={newWeight}
-                                    onChange={e => setNewWeight(e.target.value)}
-                                    required
-                                />
-                                <span className="absolute right-1 top-2 text-[10px] text-gray-400 pointer-events-none">Peso</span>
-                             </div>
-                         )}
-
-                         <button 
-                            type="button" 
-                            onClick={() => setIsExtra(!isExtra)}
-                            className={`p-2 rounded-lg border transition-colors ${isExtra ? 'bg-yellow-100 border-yellow-300 text-yellow-600' : 'border-gray-300 dark:border-gray-600 text-gray-400'}`}
-                            title="Ponto Extra"
-                         >
-                             <Star size={18} fill={isExtra ? "currentColor" : "none"} />
-                         </button>
                     </div>
-                    <button type="submit" className="bg-indigo-600 dark:bg-purple-600 text-white p-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-purple-700 transition-colors">
-                        <Plus size={20} />
-                    </button>
-                </form>
-            </div>
-            </div>
-
-            {/* Coluna Direita: Visão Geral */}
-            <div className="space-y-6">
-            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-purple-700 dark:to-indigo-900 p-6 rounded-2xl text-white shadow-lg">
-                    <h3 className="text-indigo-100 text-sm font-medium mb-1">Média {selectedTrimester}º Trimestre</h3>
-                    <div className="text-5xl font-bold mb-2">{currentTrimesterAvg.toFixed(2)}</div>
-                    <div className="flex flex-col text-indigo-200 text-xs gap-1">
-                        <span>Sistema: {activeGradingSystem === 'sum' ? 'Somatória' : activeGradingSystem === 'manual' ? 'Manual' : 'Média Ponderada'}</span>
-                        {activeGradingSystem !== settings.gradingSystem && <span>(Personalizado para Matéria)</span>}
-                        <span>{subjectAssessments.length} lançamentos</span>
-                    </div>
-            </div>
-            
-            {/* Widget de Simulação das notas */}
-            {neededScore && (
-                 <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-2xl border border-orange-100 dark:border-orange-900/50">
-                    <div className="flex items-center gap-2 text-orange-700 dark:text-orange-400 mb-2">
-                        <Calculator size={20} />
-                        <h3 className="font-bold">Simulador</h3>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                        Para passar com {settings.passingGrade}, você precisa de:
-                    </p>
-                    <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{neededScore}</div>
-                    <p className="text-xs text-gray-400 mt-1">
-                        nos próximos trimestres.
-                    </p>
-                 </div>
-            )}
+                )}
             </div>
         </div>
-        )}
-      </>
-      )}
-
-      {activeTab === 'overview' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                      <thead className="bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 uppercase font-bold text-xs">
-                          <tr>
-                              <th className="px-6 py-4">Matéria</th>
-                              <th className="px-6 py-4 text-center">1º Tri</th>
-                              <th className="px-6 py-4 text-center">2º Tri</th>
-                              <th className="px-6 py-4 text-center">3º Tri</th>
-                              <th className="px-6 py-4 text-center text-indigo-600 dark:text-purple-400">Final</th>
-                          </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-gray-900 dark:text-gray-200">
-                          {subjects.filter(s => s.type === SubjectType.NORMAL).map(sub => {
-                              const t1 = calculateSubjectAverage(assessments, sub, 1, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              const t2 = calculateSubjectAverage(assessments, sub, 2, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              const t3 = calculateSubjectAverage(assessments, sub, 3, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              const final = calculateSubjectAverage(assessments, sub, null, settings.gradeCalcMethod, settings.gradingSystem || 'average');
-                              
-                              return (
-                                  <tr key={sub.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                      <td className="px-6 py-4 font-medium flex items-center gap-2">
-                                          <div className="w-3 h-3 rounded-full" style={{backgroundColor: sub.color}} />
-                                          {sub.name}
-                                      </td>
-                                      <td className="px-6 py-4 text-center">{t1 > 0 ? t1.toFixed(1) : '-'}</td>
-                                      <td className="px-6 py-4 text-center">{t2 > 0 ? t2.toFixed(1) : '-'}</td>
-                                      <td className="px-6 py-4 text-center">{t3 > 0 ? t3.toFixed(1) : '-'}</td>
-                                      <td className={`px-6 py-4 text-center font-bold ${final < settings.passingGrade ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-                                          {final > 0 ? final.toFixed(1) : '-'}
-                                      </td>
-                                  </tr>
-                              )
-                          })}
-                      </tbody>
-                  </table>
-              </div>
-          </div>
       )}
     </div>
   );

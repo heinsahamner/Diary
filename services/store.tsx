@@ -10,7 +10,7 @@ const cleanState: AppState = {
     { 
         id: 'reposicao', 
         name: 'Reposição', 
-        color: '#aaaaaa',
+        color: '#8b5cf6',
         totalClasses: 0, 
         type: SubjectType.ORGANIZATIONAL, 
         category: SubjectCategory.OTHER 
@@ -18,7 +18,7 @@ const cleanState: AppState = {
     { 
         id: 'vago', 
         name: 'Horário Vago', 
-        color: '#1c1c1c',
+        color: '#9ca3af',
         totalClasses: 0, 
         type: SubjectType.ORGANIZATIONAL, 
         category: SubjectCategory.OTHER 
@@ -32,6 +32,7 @@ const cleanState: AppState = {
   settings: {
     totalSchoolDays: 200,
     darkMode: false,
+    compactMode: false,
     notificationsEnabled: true,
     passingGrade: 6.0,
     gradeCalcMethod: 'absolute',
@@ -143,6 +144,11 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
   const removeAssessment = (id: string) => setState(prev => ({ ...prev, assessments: prev.assessments.filter(a => a.id !== id) }));
 
+  const updateAssessment = (assessment: Assessment) => setState(prev => ({
+      ...prev,
+      assessments: prev.assessments.map(a => a.id === assessment.id ? assessment : a)
+  }));
+
   const addTask = (task: Task) => setState(prev => ({ ...prev, tasks: [...prev.tasks, task] }));
 
   const updateTask = (task: Task) => setState(prev => ({
@@ -188,6 +194,7 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
       logClass,
       addAssessment,
       removeAssessment,
+      updateAssessment,
       addTask,
       updateTask,
       deleteTask,
