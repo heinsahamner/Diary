@@ -87,31 +87,33 @@ export const Settings: React.FC = () => {
   const handlePresetSelect = (course: string, year: string) => {
       const template = PREDEFINED_GRADEBOOKS[course]?.[year];
       if (template) {
-          if (window.confirm(`Isso irá configurar ${template.subjects.length} matérias e ${template.schedule.length} aulas na sua grade. As matérias 'Reposição' e 'Horário Vago' serão atualizadas. Deseja continuar?`)) {              
+          if (window.confirm(`ATENÇÃO: Isso irá SUBSTITUIR sua grade horária atual e configurar o curso ${course} - ${year}º Ano.\n\nMatérias existentes com o mesmo nome serão mantidas.\nDeseja continuar?`)) {
               
-            const createdSubjectIds: string[] = [];
-              template.subjects.forEach((t, index) => {
+              const subjectMap = new Map<number, string>();
 
-                  if (t.name === 'Reposição') {
-                      createdSubjectIds.push('reposicao');
+              template.subjects.forEach((t, index) => {
+                  const normalizedName = t.name?.trim();
+
+                  if (normalizedName === 'Reposição') {
+                      subjectMap.set(index, 'reposicao');
                       updateSubject({
                           id: 'reposicao',
-                          name: t.name,
+                          name: 'Reposição',
                           color: t.color || '#9ca3af',
-                          totalClasses: t.totalClasses || 0,
-                          type: t.type || SubjectType.ORGANIZATIONAL,
-                          category: t.category || SubjectCategory.OTHER,
+                          totalClasses: 0,
+                          type: SubjectType.ORGANIZATIONAL,
+                          category: SubjectCategory.OTHER,
                           gradingMethod: undefined
                       });
                       return; 
                   }
                   
-                  if (t.name === 'Horário Vago' || t.name === 'Vago') {
-                      createdSubjectIds.push('vago');
+                  if (normalizedName === 'Horário Vago' || normalizedName === 'Vago') {
+                      subjectMap.set(index, 'vago');
                       updateSubject({
                           id: 'vago',
-                          name: t.name || 'Horário Vago',
-                          color: t.color || '#9ca3af',
+                          name: 'Horário Vago',
+                          color: '#9ca3af',
                           totalClasses: 0,
                           type: SubjectType.ORGANIZATIONAL,
                           category: SubjectCategory.OTHER,
@@ -120,19 +122,25 @@ export const Settings: React.FC = () => {
                       return;
                   }
 
-                  const newId = Date.now().toString() + index;
-                  createdSubjectIds.push(newId);
+                  const existingSubject = subjects.find(s => s.name.toLowerCase() === normalizedName?.toLowerCase());
                   
-                  const newSubject: SubjectTypeInterface = {
-                      id: newId,
-                      name: t.name || 'Nova Matéria',
-                      color: t.color || '#ccc',
-                      totalClasses: t.totalClasses || 80,
-                      type: t.type || SubjectType.NORMAL,
-                      category: t.category || SubjectCategory.OTHER,
-                      gradingMethod: undefined 
-                  };
-                  addSubject(newSubject);
+                  if (existingSubject) {
+                       subjectMap.set(index, existingSubject.id);
+                  } else {
+                       const newId = Date.now().toString() + '_' + index;
+                       subjectMap.set(index, newId);
+                       
+                       const newSubject: SubjectTypeInterface = {
+                          id: newId,
+                          name: normalizedName || 'Nova Matéria',
+                          color: t.color || '#ccc',
+                          totalClasses: t.totalClasses || 80,
+                          type: t.type || SubjectType.NORMAL,
+                          category: t.category || SubjectCategory.OTHER,
+                          gradingMethod: undefined
+                      };
+                      addSubject(newSubject);
+                  }
               });
 
               const newSlots: ScheduleSlot[] = template.schedule.map((slot, idx) => ({
@@ -140,16 +148,13 @@ export const Settings: React.FC = () => {
                   dayOfWeek: slot.day,
                   startTime: slot.start,
                   endTime: slot.end,
-                  subjectId: createdSubjectIds[slot.subjectIndex] || ''
+                  subjectId: subjectMap.get(slot.subjectIndex) || ''
               })).filter(s => s.subjectId !== '');
 
-              if (newSlots.length > 0) {
-                  const updatedSchedule = [...schedule, ...newSlots].sort((a,b) => a.startTime.localeCompare(b.startTime));
-                  updateSchedule(updatedSchedule);
-              }
+              updateSchedule(newSlots.sort((a,b) => a.startTime.localeCompare(b.startTime)));
 
-              alert('Grade predefinida carregada com sucesso!');
-              setSubjectViewMode('manual');
+              alert('Grade definida com sucesso!');
+              setSubjectViewMode('manual'); 
           }
       }
   };
