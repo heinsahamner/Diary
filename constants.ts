@@ -154,7 +154,7 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
         { name: "Int. Inform.", color: "#06b6d4", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 9
         { name: "Biologia I", color: "#22c55e", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 10
         { name: "História I", color: "#b45309", totalClasses: 160, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 11
-        { name: "Ética RSA", color: "#84cc16", totalClasses: 40, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
+        { name: "Ética RSA", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 12
         { name: "Física I", color: "#14b8a6", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.EXACT_SCIENCES }, // 13
         { name: "Sociologia I", color: "#f97316", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.HUMAN_SCIENCES }, // 14
         { name: "Ed. Física I", color: "#84cc16", totalClasses: 80, type: SubjectType.NORMAL, category: SubjectCategory.SPORTS }, // 15
