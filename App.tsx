@@ -11,11 +11,35 @@ import { Settings } from './pages/Settings';
 import { Tasks } from './pages/Tasks';
 import { CalendarView } from './pages/Calendar';
 import { Login } from './components/Login';
+import { WhatsNewModal } from './components/WhatsNewModal';
+import { CURRENT_VERSION, CHANGELOG, Release } from './data/changelog';
 
 function App() {
   const [user, setUser] = useState<string | null>(() => {
       return localStorage.getItem('diary_active_user') || sessionStorage.getItem('diary_active_user');
   });
+
+  const [showChangelog, setShowChangelog] = useState(false);
+  const [currentRelease, setCurrentRelease] = useState<Release | null>(null);
+
+  useEffect(() => {
+      if (!user) return;
+
+      const lastSeenVersion = localStorage.getItem('diary_last_seen_version');
+      
+      if (lastSeenVersion !== CURRENT_VERSION) {
+          const releaseData = CHANGELOG.find(r => r.version === CURRENT_VERSION);
+          if (releaseData) {
+              setCurrentRelease(releaseData);
+              setShowChangelog(true);
+          }
+      }
+  }, [user]);
+
+  const handleChangelogClose = () => {
+      setShowChangelog(false);
+      localStorage.setItem('diary_last_seen_version', CURRENT_VERSION);
+  };
 
   const handleLogin = (username: string, remember: boolean) => {
       if (remember) {
@@ -56,6 +80,13 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
+          {currentRelease && (
+              <WhatsNewModal 
+                  isOpen={showChangelog} 
+                  onClose={handleChangelogClose} 
+                  release={currentRelease} 
+              />
+          )}
         </MemoryRouter>
       </StoreProvider>
     </ToastProvider>
