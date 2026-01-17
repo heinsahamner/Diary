@@ -98,6 +98,15 @@ export const Settings: React.FC = () => {
             const existingSubject = subjects.find(s => s.name.toLowerCase() === normalizedName?.toLowerCase());
             if (existingSubject) {
                 subjectMap.set(index, existingSubject.id);
+
+                updateSubject({
+                    ...existingSubject,
+                    color: t.color || existingSubject.color,
+                    totalClasses: t.totalClasses || existingSubject.totalClasses,
+                    category: t.category || existingSubject.category,
+                    teacher: t.teacher || existingSubject.teacher
+                });
+
             } else {
                 const newId = Date.now().toString() + '_' + index;
                 subjectMap.set(index, newId);
@@ -107,7 +116,8 @@ export const Settings: React.FC = () => {
                     color: t.color || '#ccc',
                     totalClasses: t.totalClasses || 80,
                     type: t.type || SubjectType.NORMAL,
-                    category: t.category || SubjectCategory.OTHER
+                    category: t.category || SubjectCategory.OTHER,
+                    teacher: t.teacher
                 });
             }
         });
@@ -261,7 +271,7 @@ export const Settings: React.FC = () => {
                   <SettingsItem 
                     icon={<Info size={20} />} 
                     label="Sobre" 
-                    value="v2.0.0" 
+                    value="v2.0.1" 
                     onClick={() => setActiveTab('about')} 
                   />
               </SettingsGroup>
