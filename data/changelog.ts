@@ -5,8 +5,8 @@ export interface ChangeLogItem {
     type: 'feature' | 'fix' | 'improvement' | 'style';
     title: string;
     description: string;
-    contributor?: string; // Community member name
-    contributorRole?: string; // e.g. "Tester", "Idea", "Dev"
+    contributor?: string;
+    contributorRole?: string;
 }
 
 export interface Release {
