@@ -67,20 +67,6 @@ export const DBService = {
       try {
           const data = await this.getAllDataForUser(username);
           
-          // NOTA: Aqui deve se conectar ao backend MariaDB
-          /*
-          const response = await fetch(serverUrl, {
-          method: 'POST',
-
-          headers: { 'Content-Type': 'application/json' },
-
-          ody: JSON.stringify({ username, data, timestamp: new Date().toISOString() })
-          );
-
-          if (!response.ok) throw new Error('Falha ao fazer o upload');
-
-          */
-          
           console.log(`[Mock Upload] Uploading ${JSON.stringify(data).length} bytes to ${serverUrl}...`);
           await new Promise(r => setTimeout(r, 1500));
           

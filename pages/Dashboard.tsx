@@ -147,7 +147,7 @@ export const Dashboard: React.FC = () => {
                       <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
                               <Pie
-                                  data={[{ value: dailyProgress }, { value: 100 - dailyProgress }]}
+                                  data={[{ value: dailyProgress }, { value: 105 - dailyProgress }]}
                                   innerRadius={30}
                                   outerRadius={40}
                                   startAngle={90}

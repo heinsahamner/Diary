@@ -1,7 +1,7 @@
 {
   "name": "Diary",
   "short_name": "Diary",
-  "description": "O diário acadêmico pessoal do ecossistema Microspace.",
+  "description": "um app Microspace",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",
@@ -9,12 +9,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://i.imgur.com/5toQSSY.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://i.imgur.com/5toQSSY.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
       "sizes": "512x512",
       "type": "image/png"
     }

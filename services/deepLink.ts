@@ -32,13 +32,6 @@ export const DeepLinkService = {
         return { action, data: data as T };
     },
 
- /*
-* Gera uma string de URL de link direto.
-* @param path O caminho da rota (ex.: '/tasks')
-* @param action O verbo da ação (ex.: 'create')
-* @param params Pares simples de chave-valor para parâmetros de URL legíveis
-* @param payload Objeto complexo opcional a ser codificado em base64
-*/
     generateLink: (path: string, action: string, params: Record<string, string> = {}, payload?: object) => {
         const urlParams = new URLSearchParams();
         urlParams.set('action', action);

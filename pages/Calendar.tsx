@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight, Circle, CheckCircle, XCircle, Slash, Calenda
 export const CalendarView: React.FC = () => {
     const { validations, logs, tasks, subjects } = useStore();
     const navigate = useNavigate();
-
+    
     const [displayDate, setDisplayDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -40,6 +40,7 @@ export const CalendarView: React.FC = () => {
 
         return { attRate, pendingTasks };
     }, [logs, tasks, displayDate]);
+
 
     const getDayStatus = (date: Date) => {
         const key = format(date, 'yyyy-MM-dd');
@@ -159,7 +160,7 @@ export const CalendarView: React.FC = () => {
                         </div>
                         <div>
                             <p className="font-bold text-sm text-gray-700 dark:text-gray-200 mt-2">
-                                {isDayValidated ? 'Dia Letivo Iniciado' : 'Dia não iniciado'}
+                                {isDayValidated ? 'Dia Iniciado' : 'Dia não iniciado'}
                             </p>
                         </div>
                      </div>

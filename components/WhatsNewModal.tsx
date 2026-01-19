@@ -38,7 +38,7 @@ export function WhatsNewModal({ isOpen, onClose, release }: WhatsNewModalProps) 
                             <span>Nova Atualização</span>
                         </div>
                         <h2 className="text-3xl font-bold">Versão {release.version}</h2>
-                        <p className="text-indigo-100 text-sm mt-1 opacity-90">Confira o que a comunidade ajudou a construir!</p>
+                        <p className="text-indigo-100 text-sm mt-1 opacity-90">Confira o que há de novo.</p>
                     </div>
                     <button 
                         onClick={onClose}
@@ -85,7 +85,7 @@ export function WhatsNewModal({ isOpen, onClose, release }: WhatsNewModalProps) 
                         onClick={onClose}
                         className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all flex items-center justify-center gap-2 group"
                     >
-                        <span>Explorar Novidades</span>
+                        <span>Navegar</span>
                         <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>

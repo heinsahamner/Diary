@@ -1,4 +1,4 @@
-import { SubjectType, SubjectCategory, Subject } from './types';
+import { SubjectType, SubjectCategory, Subject, SpecialDay } from './types';
 
 export const DAYS_OF_WEEK = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 
@@ -15,6 +15,10 @@ export const MOCK_SUBJECTS = [
 export const DEFAULT_SCHEDULE_SLOTS = [
   { id: 's1', dayOfWeek: 1, startTime: '07:30', endTime: '08:20', subjectId: '1' },
   { id: 's2', dayOfWeek: 1, startTime: '08:20', endTime: '09:10', subjectId: '2' },
+];
+
+export const MOCK_SPECIAL_DAYS: SpecialDay[] = [
+    { id: 'sat1', date: '2024-04-13', description: 'Sábado Letivo (Abril)', customSlots: [] },
 ];
 
 interface TemplateSchedule {
@@ -226,4 +230,176 @@ export const PREDEFINED_GRADEBOOKS: Record<string, Record<string, GradebookTempl
       ]
     }
   }
+};
+
+interface OfficialCalendarEntry {
+    date: string;
+    number: number;
+    slots: { start: string; end: string; subjectName: string }[];
+}
+
+const SAT_DATES = [
+    '2026-03-09', '2026-03-23', '2026-04-06', '2026-04-20', '2026-05-04', 
+    '2026-05-18', '2026-06-08', '2026-06-22', '2026-07-06', '2026-07-27', 
+    '2026-08-10', '2026-08-24', '2026-09-14', '2026-09-28', '2026-10-05', 
+    '2026-10-19', '2026-11-09', '2026-11-23', '2026-11-30', '2026-12-07',
+    '2026-12-14'
+];
+
+const T_START = ["07:00", "07:50", "08:40", "09:50", "10:40", "11:30"];
+const T_END   = ["07:50", "08:40", "09:30", "10:40", "11:30", "12:20"];
+
+const createDay = (dateIdx: number, subjects: string[]): OfficialCalendarEntry => ({
+    date: SAT_DATES[dateIdx],
+    number: dateIdx + 1,
+    slots: subjects.map((sub, i) => ({
+        start: T_START[i] || "00:00",
+        end: T_END[i] || "00:00",
+        subjectName: sub
+    }))
+});
+
+export const OFFICIAL_SATURDAY_CALENDAR: Record<string, Record<string, OfficialCalendarEntry[]>> = {
+    "INF": {
+        "1": [
+            createDay(0, ["Filosofia I", "Filosofia I", "Espanhol", "Espanhol", "Geografia I", "Geografia I"]),
+            createDay(1, ["Matemática I", "Matemática I", "Química I", "Química I", "Ed. Física I", "Ed. Física I"]),
+            createDay(2, ["LPLB I", "LPLB I", "História I", "História I", "Algoritmos", "Algoritmos"]),
+            createDay(3, ["Inglês I", "Inglês I", "Informática Básica", "Informática Básica", "Design Web", "Design Web"]),
+            createDay(4, ["Física I", "Física I", "Biologia I", "Biologia I", "Sociologia I", "Sociologia I"]),
+            createDay(5, ["Arquitetura de Computadores", "Arquitetura de Computadores", "Matemática I", "Matemática I", "Química I", "Química I"]),
+            createDay(6, ["Filosofia I", "Filosofia I", "Espanhol", "Espanhol", "Geografia I", "Geografia I"]),
+            createDay(7, ["Matemática I", "Matemática I", "Química I", "Química I", "Ed. Física I", "Ed. Física I"]),
+            createDay(8, ["LPLB I", "LPLB I", "História I", "História I", "Algoritmos", "Algoritmos"]),
+            createDay(9, ["Inglês I", "Inglês I", "Informática Básica", "Informática Básica", "Design Web", "Design Web"]),
+            createDay(10, ["Física I", "Física I", "Biologia I", "Biologia I", "Sociologia I", "Sociologia I"]),
+            createDay(11, ["Arquitetura de Computadores", "Arquitetura de Computadores", "Matemática I", "Matemática I", "Química I", "Química I"]),
+            createDay(12, ["Filosofia I", "Filosofia I", "Espanhol", "Espanhol", "Geografia I", "Geografia I"]),
+            createDay(13, ["Matemática I", "Matemática I", "Química I", "Química I", "Ed. Física I", "Ed. Física I"]),
+            createDay(14, ["LPLB I", "LPLB I", "História I", "História I", "Algoritmos", "Algoritmos"]),
+            createDay(15, ["Inglês I", "Inglês I", "Informática Básica", "Informática Básica", "Design Web", "Design Web"]),
+            createDay(16, ["Física I", "Física I", "Biologia I", "Biologia I", "Sociologia I", "Sociologia I"]),
+            createDay(17, ["Arquitetura de Computadores", "Arquitetura de Computadores", "Matemática I", "Matemática I", "Química I", "Química I"]),
+            createDay(18, ["Filosofia I", "Filosofia I", "Espanhol", "Espanhol", "Geografia I", "Geografia I"]),
+            createDay(19, ["Matemática I", "Matemática I", "Química I", "Química I", "Ed. Física I", "Ed. Física I"]),
+            createDay(20, ["LPLB I", "LPLB I", "História I", "História I", "Algoritmos", "Algoritmos"])
+        ],
+        "2": [
+            createDay(0, ["LPLB II", "LPLB II", "Filosofia II", "Filosofia II", "Ed. Física II", "Ed. Física II"]),
+            createDay(1, ["Geografia II", "Geografia II", "Desenv. Web I", "Desenv. Web I", "Matemática II", "Matemática II"]),
+            createDay(2, ["Banco de Dados", "Banco de Dados", "Química II", "Química II", "Sociologia II", "Sociologia II"]),
+            createDay(3, ["Língua Estrangeira", "Língua Estrangeira", "Biologia II", "Biologia II", "PC Web", "PC Web"]),
+            createDay(4, ["Fund. Redes", "Fund. Redes", "Física II", "Física II", "Ed. Artística I (Música)", "Ed. Artística I (Música)"]),
+            createDay(5, ["História II", "História II", "LPLB II", "LPLB II", "Filosofia II", "Filosofia II"]),
+            createDay(6, ["Ed. Física II", "Ed. Física II", "Geografia II", "Geografia II", "Desenv. Web I", "Desenv. Web I"]),
+            createDay(7, ["Matemática II", "Matemática II", "Banco de Dados", "Banco de Dados", "Química II", "Química II"]),
+            createDay(8, ["Sociologia II", "Sociologia II", "Língua Estrangeira", "Língua Estrangeira", "Biologia II", "Biologia II"]),
+            createDay(9, ["PC Web", "PC Web", "Fund. Redes", "Fund. Redes", "Física II", "Física II"]),
+            createDay(10, ["Ed. Artística I (Música)", "Ed. Artística I (Música)", "História II", "História II", "LPLB II", "LPLB II"]),
+            createDay(11, ["Filosofia II", "Filosofia II", "Ed. Física II", "Ed. Física II", "Geografia II", "Geografia II"]),
+            createDay(12, ["Desenv. Web I", "Desenv. Web I", "Matemática II", "Matemática II", "Banco de Dados", "Banco de Dados"]),
+            createDay(13, ["Química II", "Química II", "Sociologia II", "Sociologia II", "Língua Estrangeira", "Língua Estrangeira"]),
+            createDay(14, ["Biologia II", "Biologia II", "PC Web", "PC Web", "Fund. Redes", "Fund. Redes"]),
+            createDay(15, ["Física II", "Física II", "Ed. Artística I (Música)", "Ed. Artística I (Música)", "História II", "História II"]),
+            createDay(16, ["LPLB II", "LPLB II", "Filosofia II", "Filosofia II", "Ed. Física II", "Ed. Física II"]),
+            createDay(17, ["Geografia II", "Geografia II", "Desenv. Web I", "Desenv. Web I", "Matemática II", "Matemática II"]),
+            createDay(18, ["Banco de Dados", "Banco de Dados", "Química II", "Química II", "Sociologia II", "Sociologia II"]),
+            createDay(19, ["Língua Estrangeira", "Língua Estrangeira", "Biologia II", "Biologia II", "PC Web", "PC Web"]),
+            createDay(20, ["Fund. Redes", "Fund. Redes", "Física II", "Física II", "Ed. Artística I (Música)", "Ed. Artística I (Música)"])
+        ],
+        "3": [
+            createDay(0, ["LPLB III", "LPLB III", "Filosofia III", "Filosofia III", "PDME", "PDME"]),
+            createDay(1, ["Química III", "Química III", "Matemática III", "Matemática III", "Desenv. Web II", "Desenv. Web II"]),
+            createDay(2, ["Geografia III", "Geografia III", "História III", "História III", "Língua Estrangeira", "Língua Estrangeira"]),
+            createDay(3, ["Ed. Artística II (Música)", "Ed. Artística II (Música)", "Sociologia III", "Sociologia III", "Biologia III", "Biologia III"]),
+            createDay(4, ["Física III", "Física III", "Sist. Operacionais", "Sist. Operacionais", "LPLB III", "LPLB III"]),
+            createDay(5, ["Filosofia III", "Filosofia III", "PDME", "PDME", "Química III", "Química III"]),
+            createDay(6, ["Matemática III", "Matemática III", "Desenv. Web II", "Desenv. Web II", "Geografia III", "Geografia III"]),
+            createDay(7, ["História III", "História III", "Língua Estrangeira", "Língua Estrangeira", "Ed. Artística II (Música)", "Ed. Artística II (Música)"]),
+            createDay(8, ["Sociologia III", "Sociologia III", "Biologia III", "Biologia III", "Física III", "Física III"]),
+            createDay(9, ["Sist. Operacionais", "Sist. Operacionais", "LPLB III", "LPLB III", "Filosofia III", "Filosofia III"]),
+            createDay(10, ["PDME", "PDME", "Química III", "Química III", "Matemática III", "Matemática III"]),
+            createDay(11, ["Desenv. Web II", "Desenv. Web II", "Geografia III", "Geografia III", "História III", "História III"]),
+            createDay(12, ["Língua Estrangeira", "Língua Estrangeira", "Ed. Artística II (Música)", "Ed. Artística II (Música)", "Sociologia III", "Sociologia III"]),
+            createDay(13, ["Biologia III", "Biologia III", "Física III", "Física III", "Sist. Operacionais", "Sist. Operacionais"]),
+            createDay(14, ["LPLB III", "LPLB III", "Filosofia III", "Filosofia III", "PDME", "PDME"]),
+            createDay(15, ["Química III", "Química III", "Matemática III", "Matemática III", "Desenv. Web II", "Desenv. Web II"]),
+            createDay(16, ["Geografia III", "Geografia III", "História III", "História III", "Língua Estrangeira", "Língua Estrangeira"]),
+            createDay(17, ["Ed. Artística II (Música)", "Ed. Artística II (Música)", "Sociologia III", "Sociologia III", "Biologia III", "Biologia III"]),
+            createDay(18, ["Física III", "Física III", "Sist. Operacionais", "Sist. Operacionais", "LPLB III", "LPLB III"]),
+            createDay(19, ["Filosofia III", "Filosofia III", "PDME", "PDME", "Química III", "Química III"]),
+            createDay(20, ["Matemática III", "Matemática III", "Desenv. Web II", "Desenv. Web II", "Geografia III", "Geografia III"])
+        ]
+    },
+    "ADM": {
+        "1": [
+            createDay(0, ["Filosofia I", "Filosofia I", "Comp. Org.", "Comp. Org.", "Espanhol", "Espanhol"]),
+            createDay(1, ["Matemática I", "Matemática I", "Geografia I", "Geografia I", "Química I", "Química I"]),
+            createDay(2, ["Fund. Adm.", "Fund. Adm.", "LPLB I", "LPLB I", "Int. Inform.", "Int. Inform."]),
+            createDay(3, ["Biologia I", "Biologia I", "História I", "História I", "Ética RSA", "Ética RSA"]),
+            createDay(4, ["Física I", "Física I", "Sociologia I", "Sociologia I", "Ed. Física I", "Ed. Física I"]),
+            createDay(5, ["Inglês I", "Inglês I", "Filosofia I", "Filosofia I", "Comp. Org.", "Comp. Org."]),
+            createDay(6, ["Espanhol", "Espanhol", "Matemática I", "Matemática I", "Geografia I", "Geografia I"]),
+            createDay(7, ["Química I", "Química I", "Fund. Adm.", "Fund. Adm.", "LPLB I", "LPLB I"]),
+            createDay(8, ["Int. Inform.", "Int. Inform.", "Biologia I", "Biologia I", "História I", "História I"]),
+            createDay(9, ["Ética RSA", "Ética RSA", "Física I", "Física I", "Sociologia I", "Sociologia I"]),
+            createDay(10, ["Ed. Física I", "Ed. Física I", "Inglês I", "Inglês I", "Filosofia I", "Filosofia I"]),
+            createDay(11, ["Comp. Org.", "Comp. Org.", "Espanhol", "Espanhol", "Matemática I", "Matemática I"]),
+            createDay(12, ["Geografia I", "Geografia I", "Química I", "Química I", "Fund. Adm.", "Fund. Adm."]),
+            createDay(13, ["LPLB I", "LPLB I", "Int. Inform.", "Int. Inform.", "Biologia I", "Biologia I"]),
+            createDay(14, ["História I", "História I", "Ética RSA", "Ética RSA", "Física I", "Física I"]),
+            createDay(15, ["Sociologia I", "Sociologia I", "Ed. Física I", "Ed. Física I", "Inglês I", "Inglês I"]),
+            createDay(16, ["Filosofia I", "Filosofia I", "Comp. Org.", "Comp. Org.", "Espanhol", "Espanhol"]),
+            createDay(17, ["Matemática I", "Matemática I", "Geografia I", "Geografia I", "Química I", "Química I"]),
+            createDay(18, ["Fund. Adm.", "Fund. Adm.", "LPLB I", "LPLB I", "Int. Inform.", "Int. Inform."]),
+            createDay(19, ["Biologia I", "Biologia I", "História I", "História I", "Ética RSA", "Ética RSA"]),
+            createDay(20, ["Física I", "Física I", "Sociologia I", "Sociologia I", "Ed. Física I", "Ed. Física I"])
+        ],
+        "2": [
+            createDay(0, ["LPLB II", "LPLB II", "Filosofia II", "Filosofia II", "Ed. Física II", "Ed. Física II"]),
+            createDay(1, ["Geografia II", "Geografia II", "Marketing", "Marketing", "Contabilidade", "Contabilidade"]),
+            createDay(2, ["Matemática II", "Matemática II", "Logística", "Logística", "Química II", "Química II"]),
+            createDay(3, ["Sociologia II", "Sociologia II", "Língua Estrangeira", "Língua Estrangeira", "História II", "História II"]),
+            createDay(4, ["Legisl. Trab.", "Legisl. Trab.", "SIG e OSM", "SIG e OSM", "Física II", "Física II"]),
+            createDay(5, ["Ed. Artística I (Música)", "Ed. Artística I (Música)", "Biologia II", "Biologia II", "LPLB II", "LPLB II"]),
+            createDay(6, ["Filosofia II", "Filosofia II", "Ed. Física II", "Ed. Física II", "Geografia II", "Geografia II"]),
+            createDay(7, ["Marketing", "Marketing", "Contabilidade", "Contabilidade", "Matemática II", "Matemática II"]),
+            createDay(8, ["Logística", "Logística", "Química II", "Química II", "Sociologia II", "Sociologia II"]),
+            createDay(9, ["Língua Estrangeira", "Língua Estrangeira", "História II", "História II", "Legisl. Trab.", "Legisl. Trab."]),
+            createDay(10, ["SIG e OSM", "SIG e OSM", "Física II", "Física II", "Ed. Artística I (Música)", "Ed. Artística I (Música)"]),
+            createDay(11, ["Biologia II", "Biologia II", "LPLB II", "LPLB II", "Filosofia II", "Filosofia II"]),
+            createDay(12, ["Ed. Física II", "Ed. Física II", "Geografia II", "Geografia II", "Marketing", "Marketing"]),
+            createDay(13, ["Contabilidade", "Contabilidade", "Matemática II", "Matemática II", "Logística", "Logística"]),
+            createDay(14, ["Química II", "Química II", "Sociologia II", "Sociologia II", "Língua Estrangeira", "Língua Estrangeira"]),
+            createDay(15, ["História II", "História II", "Legisl. Trab.", "Legisl. Trab.", "SIG e OSM", "SIG e OSM"]),
+            createDay(16, ["Física II", "Física II", "Ed. Artística I (Música)", "Ed. Artística I (Música)", "Biologia II", "Biologia II"]),
+            createDay(17, ["LPLB II", "LPLB II", "Filosofia II", "Filosofia II", "Ed. Física II", "Ed. Física II"]),
+            createDay(18, ["Geografia II", "Geografia II", "Marketing", "Marketing", "Contabilidade", "Contabilidade"]),
+            createDay(19, ["Matemática II", "Matemática II", "Logística", "Logística", "Química II", "Química II"]),
+            createDay(20, ["Sociologia II", "Sociologia II", "Língua Estrangeira", "Língua Estrangeira", "História II", "História II"])
+        ],
+        "3": [
+            createDay(0, ["LPLB III", "LPLB III", "Filosofia III", "Filosofia III", "Empreend. Inov.", "Empreend. Inov."]),
+            createDay(1, ["Gest. Pessoas", "Gest. Pessoas", "Economia", "Economia", "Química III", "Química III"]),
+            createDay(2, ["Matemática III", "Matemática III", "APO", "APO", "Adm. Finan. Orç.", "Adm. Finan. Orç."]),
+            createDay(3, ["Geografia III", "Geografia III", "História III", "História III", "Língua Estrangeira", "Língua Estrangeira"]),
+            createDay(4, ["Ed. Artística II (Música)", "Ed. Artística II (Música)", "Sociologia III", "Sociologia III", "Biologia III", "Biologia III"]),
+            createDay(5, ["Física III", "Física III", "LPLB III", "LPLB III", "Filosofia III", "Filosofia III"]),
+            createDay(6, ["Empreend. Inov.", "Empreend. Inov.", "Gest. Pessoas", "Gest. Pessoas", "Economia", "Economia"]),
+            createDay(7, ["Química III", "Química III", "Matemática III", "Matemática III", "APO", "APO"]),
+            createDay(8, ["Adm. Finan. Orç.", "Adm. Finan. Orç.", "Geografia III", "Geografia III", "História III", "História III"]),
+            createDay(9, ["Língua Estrangeira", "Língua Estrangeira", "Ed. Artística II (Música)", "Ed. Artística II (Música)", "Sociologia III", "Sociologia III"]),
+            createDay(10, ["Biologia III", "Biologia III", "Física III", "Física III", "LPLB III", "LPLB III"]),
+            createDay(11, ["Filosofia III", "Filosofia III", "Empreend. Inov.", "Empreend. Inov.", "Gest. Pessoas", "Gest. Pessoas"]),
+            createDay(12, ["Economia", "Economia", "Química III", "Química III", "Matemática III", "Matemática III"]),
+            createDay(13, ["APO", "APO", "Adm. Finan. Orç.", "Adm. Finan. Orç.", "Geografia III", "Geografia III"]),
+            createDay(14, ["História III", "História III", "Língua Estrangeira", "Língua Estrangeira", "Ed. Artística II (Música)", "Ed. Artística II (Música)"]),
+            createDay(15, ["Sociologia III", "Sociologia III", "Biologia III", "Biologia III", "Física III", "Física III"]),
+            createDay(16, ["LPLB III", "LPLB III", "Filosofia III", "Filosofia III", "Empreend. Inov.", "Empreend. Inov."]),
+            createDay(17, ["Gest. Pessoas", "Gest. Pessoas", "Economia", "Economia", "Química III", "Química III"]),
+            createDay(18, ["Matemática III", "Matemática III", "APO", "APO", "Adm. Finan. Orç.", "Adm. Finan. Orç."]),
+            createDay(19, ["Geografia III", "Geografia III", "História III", "História III", "Língua Estrangeira", "Língua Estrangeira"]),
+            createDay(20, ["Ed. Artística II (Música)", "Ed. Artística II (Música)", "Sociologia III", "Sociologia III", "Biologia III", "Biologia III"])
+        ]
+    }
 };

@@ -35,7 +35,6 @@ export const Stats: React.FC = () => {
   const { subjects, logs, schedule, validations, assessments, settings, currentUser } = useStore();
   const normalSubjects = subjects.filter(s => s.type === SubjectType.NORMAL);
 
-
   const subjectStats = useMemo(() => {
      return normalSubjects.map(sub => {
          const limit = Math.floor(sub.totalClasses * 0.25);
@@ -103,7 +102,7 @@ export const Stats: React.FC = () => {
              final,
              finalFixed: final.toFixed(1),
              isRiskGrade: final < settings.passingGrade && final > 0,
-             isRiskAbsence: bank <= (limit * 0.2) 
+             isRiskAbsence: bank <= (limit * 0.2)
          };
      });
   }, [normalSubjects, logs, validations, schedule, assessments, settings]);
@@ -159,7 +158,7 @@ export const Stats: React.FC = () => {
   const absenceData = useMemo(() => {
       return [...subjectStats]
         .sort((a,b) => b.absencePercentage - a.absencePercentage)
-        .slice(0, 5) 
+        .slice(0, 5)
         .map(s => ({
             name: s.name,
             used: s.absences,
@@ -296,7 +295,7 @@ export const Stats: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
                <h3 className="font-bold text-gray-700 dark:text-white mb-4 flex items-center gap-2">
                    <AlertOctagon size={20} className="text-orange-500" />
-                   Consumo de Faltas
+                   Faltas Consumidas
                </h3>
                <div className="space-y-4">
                    {absenceData.length === 0 ? (

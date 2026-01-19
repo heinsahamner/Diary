@@ -54,7 +54,7 @@ const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | u
 };
 
 export const Grades: React.FC = () => {
-  const { subjects, assessments, addAssessment, removeAssessment, updateAssessment, settings, logs, schedule, validations } = useStore();
+  const { subjects, assessments, addAssessment, removeAssessment, updateAssessment, settings, logs, schedule, validations } = useStore(); 
   
   const [viewMode, setViewMode] = useState<'overview' | 'detail'>('overview');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(subjects.find(s => s.type === SubjectType.NORMAL)?.id || '');
@@ -113,7 +113,7 @@ export const Grades: React.FC = () => {
           { name: 'T2', score: data.t2 },
           { name: 'T3', score: data.t3 },
       ];
-      return { ...data, trend, classesHeld: 0 }; 
+      return { ...data, trend, classesHeld: 0 };
   }, [currentSubject, reportCard]);
 
   const openForm = (assessment?: Assessment) => {
@@ -200,7 +200,7 @@ export const Grades: React.FC = () => {
   return (
     <div className="pb-20 space-y-6">
       <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Boletim Escolar</h1>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Boletim (Notas)</h1>
           <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl">
               <button 
                 onClick={() => setViewMode('overview')}

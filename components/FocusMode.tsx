@@ -9,7 +9,7 @@ interface FocusModeProps {
 }
 
 export const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onUpdateTask }) => {
-    const [timeLeft, setTimeLeft] = useState(25 * 60); 
+    const [timeLeft, setTimeLeft] = useState(25 * 60);
     const [isActive, setIsActive] = useState(false);
     const [sessionMinutes, setSessionMinutes] = useState(0);
 
@@ -70,7 +70,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({ task, onClose, onUpdateTas
 
             <div className="text-center mb-8 px-4">
                 <div className="inline-block px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold mb-4 border border-indigo-500/50">
-                    MODO FOCO
+                    Modo Foco
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-2 max-w-2xl">{task.title}</h2>
                 <p className="text-gray-400">Tempo dedicado hoje: {sessionMinutes} min</p>

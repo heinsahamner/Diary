@@ -37,10 +37,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             } else {
                 const result = await AuthService.login(name.trim(), password);
                 if (result.success) {
-                    addToast(`Bem-vindo de volta, ${name}!`, 'success');
+                    addToast(`Bem-vindo(a) de volta, ${name}!`, 'success');
                     onLogin(name.trim(), rememberMe);
                 } else {
-                    addToast(result.message || 'Credenciais inválidas.', 'error');
+                    addToast(result.message || 'Dados inválidos.', 'error');
                 }
             }
         } catch (err) {
@@ -80,22 +80,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             <BookOpen size={24} className="text-white" />
                         </div>
                         <h1 className="text-4xl font-bold mb-2">Diary.</h1>
-                        <p className="text-indigo-100 text-lg">um app Microspace.</p>
+                        <p className="text-indigo-100 text-lg">um app Microsapce.</p>
                     </div>
 
                     <div className="relative z-10 space-y-4 hidden md:block">
                         <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
                             <div className="p-2 bg-indigo-500 rounded-lg"><Sparkles size={18} /></div>
                             <div>
-                                <p className="font-bold text-sm">Controle de Notas</p>
-                                <p className="text-xs text-indigo-100">Estatísticas e mais</p>
+                                <p className="font-bold text-sm">Gerencie seus dados escolares.</p>
+                                <p className="text-xs text-indigo-100">Tarefas, notas, frequência e mais.</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
                             <div className="p-2 bg-purple-500 rounded-lg"><Lock size={18} /></div>
                             <div>
-                                <p className="font-bold text-sm">Privacidade</p>
-                                <p className="text-xs text-indigo-100">Seus dados salvos apenas no seu dispositivo</p>
+                                <p className="font-bold text-sm">Funciona offline.</p>
+                                <p className="text-xs text-indigo-100">Mas atenção, seus dados ficam salvos apenas neste dispositivo.</p>
                             </div>
                         </div>
                     </div>
@@ -110,11 +110,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                                 <h2>Resetar Dados</h2>
                             </div>
                             <p className="text-sm text-gray-600 dark:text-gray-300">
-                                Esqueceu sua senha? Como este é um app <strong>local-first</strong> (offline), não podemos recuperar sua senha. 
-                                Você deve limpar o banco de dados local para criar uma nova conta.
+                                Esqueceu sua senha? Como o Diary é um app offline, não é possível recuperar sua senha. 
+                                Você deve limpar o banco de dados local para criar uma nova conta, caso não se lembre.
                             </p>
                             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900">
-                                <p className="text-xs text-red-600 dark:text-red-400 font-bold mb-2 uppercase">Ação Destrutiva</p>
+                                <p className="text-xs text-red-600 dark:text-red-400 font-bold mb-2 uppercase">Ação Irreversível!</p>
                                 <p className="text-xs text-gray-600 dark:text-gray-300 mb-4">Isso apagará todas as notas, faltas e tarefas deste dispositivo.</p>
                                 <label className="block text-xs font-bold text-gray-500 mb-1">Digite "DELETAR" abaixo:</label>
                                 <input 
@@ -133,22 +133,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         <form onSubmit={handleSubmit} className="animate-fade-in space-y-6">
                             <div>
                                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                                    {mode === 'login' ? 'Bem-vindo' : 'Criar Conta'}
+                                    {mode === 'login' ? 'Bem-vindo(a)' : 'Criar Conta'}
                                 </h2>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                                    {mode === 'login' ? 'Insira suas credenciais para acessar.' : 'Preencha os dados para começar.'}
+                                    {mode === 'login' ? 'Insira seus dados para acessar.' : 'Preencha os dados para começar.'}
                                 </p>
                             </div>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 ml-1">USUÁRIO</label>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 ml-1">Usuário.</label>
                                     <div className="relative group">
                                         <User className="absolute left-3 top-3.5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                                         <input 
                                             type="text" 
                                             className="w-full pl-10 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
-                                            placeholder="Ex: estudante"
+                                            placeholder="Ex: Ana Mitiko"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                             required
@@ -157,7 +157,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                                 </div>
                                 <div>
                                     <div className="flex justify-between items-center mb-1 ml-1">
-                                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400">SENHA</label>
+                                        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400">Senha.</label>
                                         {mode === 'login' && (
                                             <button type="button" onClick={() => setMode('reset')} className="text-xs text-indigo-600 dark:text-purple-400 hover:underline">
                                                 Esqueceu?
@@ -233,7 +233,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </div>
             
             <div className="absolute bottom-4 text-xs text-gray-400 dark:text-gray-600">
-                v2.0.0 • Diary, from Microspace
+                v2.0.2 • Diary, from Microspace.
             </div>
         </div>
     );

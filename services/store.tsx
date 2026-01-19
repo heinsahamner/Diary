@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, SystemSettings, SubjectType, SubjectCategory } from '../types';
+import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, SystemSettings, SubjectType, SubjectCategory, SpecialDay } from '../types';
 import { DBService } from './db';
 import { Loader2 } from 'lucide-react';
 
@@ -25,6 +25,7 @@ const cleanState: AppState = {
     }
   ],
   schedule: [],
+  specialDays: [],
   logs: [],
   validations: [],
   assessments: [],
@@ -78,6 +79,7 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
                     ...cleanState,
                     ...data,
                     subjects: mergedSubjects,
+                    specialDays: data.specialDays || [],
                     settings: { ...cleanState.settings, ...(data.settings || {}), currentYear: activeYear }
                 });
             } else {
@@ -127,10 +129,29 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
   const updateSchedule = (slots: ScheduleSlot[]) => setState(prev => ({ ...prev, schedule: slots }));
 
+  const addSpecialDay = (day: SpecialDay) => setState(prev => ({ ...prev, specialDays: [...prev.specialDays.filter(d => d.date !== day.date), day] }));
+  const removeSpecialDay = (date: string) => setState(prev => ({ ...prev, specialDays: prev.specialDays.filter(d => d.date !== date) }));
+
   const validateDay = (date: string) => setState(prev => {
-      if (prev.validations.find(v => v.date === date)) return prev;
-      return { ...prev, validations: [...prev.validations, { date, isValidated: true }] };
+      const existing = prev.validations.find(v => v.date === date);
+      if (existing) {
+          return {
+              ...prev,
+              validations: prev.validations.map(v => v.date === date ? { ...v, isLocked: false } : v)
+          };
+      }
+      return { ...prev, validations: [...prev.validations, { date, isValidated: true, isLocked: false }] };
   });
+
+  const lockDay = (date: string) => setState(prev => ({
+      ...prev,
+      validations: prev.validations.map(v => v.date === date ? { ...v, isLocked: true } : v)
+  }));
+
+  const invalidateDay = (date: string) => setState(prev => ({
+      ...prev,
+      validations: prev.validations.filter(v => v.date !== date)
+  }));
 
   const logClass = (log: ClassLog) => setState(prev => {
       const existingIndex = prev.logs.findIndex(l => l.date === log.date && l.slotId === log.slotId);
@@ -190,7 +211,11 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
       updateSubject,
       removeSubject,
       updateSchedule,
+      addSpecialDay,
+      removeSpecialDay,
       validateDay,
+      lockDay,
+      invalidateDay,
       logClass,
       addAssessment,
       removeAssessment,

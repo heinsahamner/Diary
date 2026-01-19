@@ -1,4 +1,4 @@
-const CACHE_NAME = 'diary';
+const CACHE_NAME = 'diary-student-planner-v2';
 
 const PRECACHE_URLS = [
   '/',

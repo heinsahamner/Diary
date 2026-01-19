@@ -56,9 +56,16 @@ export interface ScheduleSlot {
   subjectId: string;
 }
 
+export interface SpecialDay {
+    id: string;
+    date: string;
+    description: string;
+    customSlots: ScheduleSlot[];
+}
+
 export interface ClassLog {
   id: string;
-  date: string; 
+  date: string;
   slotId: string; 
   originalSubjectId: string;
   actualSubjectId: string; 
@@ -69,6 +76,7 @@ export interface ClassLog {
 export interface DayValidation {
   date: string; 
   isValidated: boolean; 
+  isLocked?: boolean; 
 }
 
 export interface Assessment {
@@ -76,7 +84,7 @@ export interface Assessment {
   subjectId: string;
   trimester: 1 | 2 | 3;
   name: string;
-  value: number; 
+  value: number;
   weight: number;
   date: string;
   isExtra?: boolean; 
@@ -96,22 +104,22 @@ export interface Task {
   value?: number;
   type: TaskType;
   status: TaskStatus;
-  priority: TaskPriority; 
+  priority: TaskPriority;
   members?: string;
   description?: string; 
   subtasks?: Subtask[]; 
-  timeSpent?: number;
+  timeSpent?: number; 
 }
 
 export type GradeCalcMethod = 'running' | 'absolute';
 export type GradingSystem = 'average' | 'sum' | 'manual';
 
 export interface SystemSettings {
-  totalSchoolDays: number; 
+  totalSchoolDays: number;
   darkMode: boolean;
-  compactMode: boolean; 
+  compactMode: boolean;
   notificationsEnabled: boolean;
-  passingGrade: number;
+  passingGrade: number; 
   gradeCalcMethod: GradeCalcMethod; 
   gradingSystem: GradingSystem; 
   currentYear: number;
@@ -120,6 +128,7 @@ export interface SystemSettings {
 export interface AppState {
   subjects: Subject[];
   schedule: ScheduleSlot[];
+  specialDays: SpecialDay[]; 
   logs: ClassLog[];
   validations: DayValidation[];
   assessments: Assessment[];
@@ -133,7 +142,11 @@ export interface AppContextType extends AppState {
   updateSubject: (s: Subject) => void;
   removeSubject: (id: string) => void;
   updateSchedule: (slots: ScheduleSlot[]) => void;
+  addSpecialDay: (d: SpecialDay) => void;
+  removeSpecialDay: (date: string) => void;
   validateDay: (date: string) => void;
+  lockDay: (date: string) => void;
+  invalidateDay: (date: string) => void; 
   logClass: (log: ClassLog) => void;
   addAssessment: (a: Assessment) => void;
   removeAssessment: (id: string) => void;

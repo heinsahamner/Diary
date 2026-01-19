@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { useToast } from '../components/Toast';
-import { format, addDays, subDays, isToday, isSameDay } from 'date-fns';
+import { format, addDays, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Slash, RefreshCw, Lock, ArrowRightLeft, StickyNote, Save, Calendar as CalendarIcon, RotateCcw, Clock } from 'lucide-react';
-import { ClassLog, ClassStatus, Subject, SubjectType, ScheduleSlot } from '../types';
+import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Slash, RefreshCw, Lock, Unlock, ArrowRightLeft, StickyNote, Save, Calendar as CalendarIcon, RotateCcw, Clock, AlertOctagon, ShieldCheck } from 'lucide-react';
+import { ClassLog, ClassStatus, SubjectType, ScheduleSlot } from '../types';
 import { useSearchParams } from 'react-router-dom';
 
 export const Diary: React.FC = () => {
-  const { schedule, subjects, logs, validations, validateDay, logClass, settings } = useStore();
+  const { schedule, subjects, logs, validations, validateDay, lockDay, logClass, settings, specialDays } = useStore();
   const { addToast } = useToast();
   const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -31,15 +31,33 @@ export const Diary: React.FC = () => {
   const dateKey = format(currentDate, 'yyyy-MM-dd');
   const dayOfWeek = currentDate.getDay();
   
-  const isValidated = validations.some(v => v.date === dateKey);
+  const validation = validations.find(v => v.date === dateKey);
+  const isActive = validation && !validation.isLocked;
+  const isLocked = validation && validation.isLocked;
+  const isNotStarted = !validation;
 
-  const dailySlots = schedule
-    .filter(s => s.dayOfWeek === dayOfWeek)
-    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const specialDay = specialDays.find(sd => sd.date === dateKey);
+
+  let dailySlots: ScheduleSlot[] = [];
+
+  if (specialDay) {
+      dailySlots = specialDay.customSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+  } else {
+      dailySlots = schedule
+        .filter(s => s.dayOfWeek === dayOfWeek)
+        .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }
 
   const handleValidateDay = () => {
     validateDay(dateKey);
-    addToast('Dia letivo iniciado! Agora você pode registrar presenças.', 'success');
+    addToast(isLocked ? 'Dia destrancado. Edições permitidas.' : 'Dia iniciado!', 'success');
+  };
+
+  const handleLockDay = () => {
+    if (window.confirm('🔒 Trancar este dia?\n\nA grade será ocultada e as edições bloqueadas.')) {
+        lockDay(dateKey);
+        addToast('Dia trancado com sucesso.', 'info');
+    }
   };
 
   const getLogForSlot = (slotId: string): ClassLog | undefined => {
@@ -47,7 +65,7 @@ export const Diary: React.FC = () => {
   };
 
   const handleStatusToggle = (slot: ScheduleSlot) => {
-    if (!isValidated) return;
+    if (!isActive) return;
 
     const currentLog = getLogForSlot(slot.id);
     let nextStatus = ClassStatus.PRESENT;
@@ -72,7 +90,6 @@ export const Diary: React.FC = () => {
 
   const handleSubstitute = (slot: ScheduleSlot, newSubjectId: string) => {
     const currentLog = getLogForSlot(slot.id);
-    
     const newStatus = newSubjectId === 'vago' ? ClassStatus.CANCELED : ClassStatus.PRESENT;
 
     const newLog: ClassLog = {
@@ -86,7 +103,7 @@ export const Diary: React.FC = () => {
     };
     logClass(newLog);
     setSwappingSlotId(null);
-    addToast('Grade horária atualizada para esta aula.', 'info');
+    addToast('Grade horária atualizada.', 'info');
   }
 
   const handleEditNote = (slot: ScheduleSlot) => {
@@ -112,78 +129,95 @@ export const Diary: React.FC = () => {
     addToast('Anotação salva.', 'success');
   };
 
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if(e.target.value) {
+          const [y, m, d] = e.target.value.split('-').map(Number);
+          setCurrentDate(new Date(y, m - 1, d));
+      }
+  };
+
   return (
     <div className="max-w-3xl mx-auto pb-20">
-      <div className="flex items-center justify-between mb-8 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative">
-        <button onClick={() => setCurrentDate(subDays(currentDate, 1))} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 transition-colors">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-8 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 relative gap-4 md:gap-0 z-10">
+        
+        <div className="flex md:hidden items-center justify-between w-full relative z-20">
+            <button onClick={() => setCurrentDate(subDays(currentDate, 1))} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 transition-colors z-30">
+              <ChevronLeft size={24} />
+            </button>
+            <div className="text-center relative group cursor-pointer z-10">
+              <input 
+                type="date" 
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                value={format(currentDate, 'yyyy-MM-dd')}
+                onChange={handleDateChange}
+              />
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white capitalize flex items-center justify-center gap-2 pointer-events-none">
+                  {format(currentDate, 'EEEE', { locale: ptBR })}
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-xs capitalize pointer-events-none">{format(currentDate, "d 'de' MMM", { locale: ptBR })}</p>
+            </div>
+            <button onClick={() => setCurrentDate(addDays(currentDate, 1))} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 transition-colors z-30">
+              <ChevronRight size={24} />
+            </button>
+        </div>
+
+        <button onClick={() => setCurrentDate(subDays(currentDate, 1))} className="hidden md:block p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 transition-colors relative z-20">
           <ChevronLeft size={24} />
         </button>
         
-        <div className="text-center relative group cursor-pointer">
+        <div className="hidden md:block text-center relative group cursor-pointer flex-1 z-10">
           <input 
             type="date" 
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
             value={format(currentDate, 'yyyy-MM-dd')}
-            onChange={(e) => {
-                if(e.target.valueAsDate) setCurrentDate(e.target.valueAsDate);
-            }}
+            onChange={handleDateChange}
           />
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize flex items-center justify-center gap-2 group-hover:text-indigo-600 dark:group-hover:text-purple-400 transition-colors">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize flex items-center justify-center gap-2 group-hover:text-indigo-600 dark:group-hover:text-purple-400 transition-colors pointer-events-none">
               {format(currentDate, 'EEEE', { locale: ptBR })}
               <CalendarIcon size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm capitalize">{format(currentDate, "d 'de' MMMM, yyyy", { locale: ptBR })}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm capitalize pointer-events-none">{format(currentDate, "d 'de' MMMM, yyyy", { locale: ptBR })}</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end border-t md:border-t-0 border-gray-100 dark:border-gray-700 pt-3 md:pt-0 relative z-50">
+            {isActive && (
+                <button
+                    onClick={handleLockDay}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 rounded-xl font-bold text-xs hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-800"
+                    title="Trancar Dia"
+                >
+                    <Lock size={16} />
+                    <span>Trancar</span>
+                </button>
+            )}
             {!isToday(currentDate) && (
                 <button 
                     onClick={() => setCurrentDate(new Date())}
-                    className="absolute right-14 md:static p-2 hover:bg-indigo-50 dark:hover:bg-purple-900/30 rounded-full text-indigo-600 dark:text-purple-400 transition-colors"
+                    className="p-2 hover:bg-indigo-50 dark:hover:bg-purple-900/30 rounded-full text-indigo-600 dark:text-purple-400 transition-colors"
                     title="Ir para Hoje"
                 >
                     <RotateCcw size={20} />
                 </button>
             )}
-            <button onClick={() => setCurrentDate(addDays(currentDate, 1))} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 transition-colors">
+            <button onClick={() => setCurrentDate(addDays(currentDate, 1))} className="hidden md:block p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 transition-colors">
               <ChevronRight size={24} />
             </button>
         </div>
       </div>
-
-      {!isValidated ? (
-        <div className="text-center py-12 px-4 bg-white/50 dark:bg-gray-800/50 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700 animate-fade-in">
-           <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-             <Lock className="text-gray-400" />
-           </div>
-           <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">Dia Não Iniciado</h3>
-           <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">
-             As aulas de hoje ainda estão bloqueadas. Confirme abaixo para começar a registrar sua presença.
-           </p>
-           {dailySlots.length > 0 ? (
-             <button 
-               onClick={handleValidateDay}
-               className="bg-indigo-600 dark:bg-purple-600 hover:bg-indigo-700 dark:hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all transform hover:scale-105"
-             >
-               Iniciar Dia Letivo
-             </button>
-           ) : (
-             <p className="text-sm font-medium text-orange-500">Sem aulas programadas para este dia.</p>
-           )}
-           
-           <div className="mt-10 opacity-40 pointer-events-none filter blur-[1px]">
-             {dailySlots.map(slot => {
-               const sub = subjects.find(s => s.id === slot.subjectId);
-               return (
-                 <div key={slot.id} className="flex items-center p-4 border-b border-gray-200 dark:border-gray-700 last:border-0">
-                    <div className="w-16 text-sm font-mono text-gray-500">{slot.startTime}</div>
-                    <div className="flex-1 font-bold text-gray-800 dark:text-gray-300">{sub?.name}</div>
-                 </div>
-               );
-             })}
-           </div>
-        </div>
-      ) : (
+      
+      {specialDay && (
+          <div className="mb-6 bg-orange-50 dark:bg-orange-900/20 p-4 rounded-2xl border border-orange-200 dark:border-orange-800 flex items-center gap-3 animate-fade-in">
+              <div className="p-2 bg-orange-100 dark:bg-orange-800 rounded-full text-orange-600 dark:text-orange-300">
+                  <AlertOctagon size={20} />
+              </div>
+              <div>
+                  <p className="font-bold text-orange-800 dark:text-orange-200 text-sm">Horário Excepcional</p>
+                  <p className="text-orange-600 dark:text-orange-300 text-xs">{specialDay.description}</p>
+              </div>
+          </div>
+      )}
+      
+      {isActive ? (
         <div className={`space-y-${settings.compactMode ? '2' : '4'} animate-fade-in`}>
           {dailySlots.length === 0 && (
              <div className="text-center py-20 flex flex-col items-center justify-center">
@@ -225,7 +259,7 @@ export const Diary: React.FC = () => {
                 statusIcon = <Slash className="text-gray-400" size={settings.compactMode ? 24 : 28} />;
             } else {
                 statusColor = 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-700';
-                statusIcon = <div className="w-7 h-7" />; 
+                statusIcon = <div className="w-7 h-7" />;
             }
 
             return (
@@ -345,6 +379,51 @@ export const Diary: React.FC = () => {
               </div>
             );
           })}
+        </div>
+      ) : (
+        <div className={`text-center py-12 px-6 rounded-3xl border animate-fade-in transition-all ${isLocked ? 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-900/50' : 'bg-white/50 dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 border-dashed'}`}>
+           <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-sm ${isLocked ? 'bg-red-100 dark:bg-red-900/30 text-red-500' : 'bg-gray-100 dark:bg-gray-700 text-gray-400'}`}>
+             {isLocked ? <Lock size={40} /> : <ShieldCheck size={40} />}
+           </div>
+           
+           <h3 className={`text-xl font-bold mb-2 ${isLocked ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-200'}`}>
+               {isLocked ? 'Dia Trancado' : 'Dia Não Iniciado'}
+           </h3>
+           
+           <p className={`text-sm max-w-sm mx-auto mb-8 leading-relaxed ${isLocked ? 'text-red-600/80 dark:text-red-300/70' : 'text-gray-500 dark:text-gray-400'}`}>
+             {isLocked
+                ? 'Este dia foi trancado manualmente. Suas presenças estão salvas, mas a edição está bloqueada.' 
+                : 'As aulas deste dia estão bloqueadas. Inicie o dia para liberar o registro de presenças.'}
+           </p>
+           
+           {dailySlots.length > 0 ? (
+             <button 
+               onClick={handleValidateDay}
+               className={`font-bold py-3.5 px-8 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto
+                 ${isLocked 
+                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-200/50 dark:shadow-none ring-2 ring-red-500 ring-offset-2 dark:ring-offset-gray-900' 
+                    : 'bg-indigo-600 dark:bg-purple-600 hover:bg-indigo-700 dark:hover:bg-purple-700 text-white shadow-indigo-200/50 dark:shadow-none'}
+               `}
+             >
+               {isLocked ? <Unlock size={18} /> : null}
+               {isLocked ? 'Destrancar Dia' : 'Iniciar Dia'}
+             </button>
+           ) : (
+             <p className="text-sm font-medium text-orange-500">Sem aulas programadas para este dia.</p>
+           )}
+           
+           <div className="mt-12 opacity-30 pointer-events-none filter blur-[2px] select-none scale-95 origin-top">
+             {dailySlots.slice(0, 3).map(slot => {
+               const sub = subjects.find(s => s.id === slot.subjectId);
+               return (
+                 <div key={slot.id} className="flex items-center p-4 border-b border-gray-400/50 dark:border-gray-600/50 last:border-0">
+                    <div className="w-16 text-sm font-mono text-gray-500">{slot.startTime}</div>
+                    <div className="flex-1 font-bold text-gray-800 dark:text-gray-300">{sub?.name}</div>
+                 </div>
+               );
+             })}
+             {dailySlots.length > 3 && <div className="p-4 text-center text-gray-400">... e mais {dailySlots.length - 3} aulas</div>}
+           </div>
         </div>
       )}
     </div>

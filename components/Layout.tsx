@@ -56,7 +56,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
         </nav>
         
         <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
-            <p className="text-xs text-center text-gray-400">Diary - v2.0.1</p>
+            <p className="text-xs text-center text-gray-400">v2.0.2 • Diary</p>
         </div>
       </aside>
 
