@@ -31,7 +31,7 @@ export const CHANGELOG: Release[] = [
                 type: 'style',
                 title: 'Modo Compacto',
                 description: 'Nova opção nos ajustes para reduzir o tamanho dos itens nas listas.',
-                contributor: 'Ana Júlia',
+                contributor: 'Lucas Willian',
                 contributorRole: 'Design'
             },
             {
