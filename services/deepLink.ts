@@ -15,7 +15,12 @@ export const DeepLinkService = {
         const payload = searchParams.get('payload');
         if (payload) {
             try {
-                const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+                let base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+                
+                const pad = base64.length % 4;
+                if (pad) {
+                    base64 += '='.repeat(4 - pad);
+                }
                 
                 const binaryString = atob(base64);
 
@@ -25,9 +30,10 @@ export const DeepLinkService = {
             } catch (e) {
                 console.error('DeepLink: Failed to parse payload', e);
                 try {
-                    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-                    data = JSON.parse(atob(base64));
+                    const simpleBase64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+                    data = JSON.parse(atob(simpleBase64));
                 } catch (e2) {
+                    console.warn('DeepLink: Legacy parse failed', e2);
                 }
             }
         }

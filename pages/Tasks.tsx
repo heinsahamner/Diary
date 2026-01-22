@@ -12,6 +12,8 @@ import { format, isBefore, startOfToday, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useSearchParams } from 'react-router-dom';
 
+// --- Components ---
+
 const PriorityBadge: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
     const colors = {
         high: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-900',
@@ -35,9 +37,11 @@ export const Tasks: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [focusedTask, setFocusedTask] = useState<Task | null>(null);
 
+  // Filter State
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
 
+  // New Task Form State
   const [formTitle, setFormTitle] = useState('');
   const [formSubject, setFormSubject] = useState('');
   const [formDate, setFormDate] = useState(format(addDays(new Date(), 1), 'yyyy-MM-dd'));
@@ -64,19 +68,23 @@ export const Tasks: React.FC = () => {
               setFormPriority('medium');
           }
 
-          if (data.subject) {
-              const matchedSubject = subjects.find(s => 
-                  s.name.toLowerCase().includes(data.subject.toLowerCase()) || 
-                  s.id === data.subject
-              );
-              if (matchedSubject) {
-                  setFormSubject(matchedSubject.id);
+          let subjectToSet = '';
+          if (subjects.length > 0) {
+              if (data.subject) {
+                  const matchedSubject = subjects.find(s => 
+                      s.name.toLowerCase().includes(data.subject.toLowerCase()) || 
+                      s.id === data.subject
+                  );
+                  if (matchedSubject) {
+                      subjectToSet = matchedSubject.id;
+                  } else {
+                      subjectToSet = subjects[0].id;
+                  }
               } else {
-                  setFormSubject(subjects[0]?.id || '');
+                  subjectToSet = subjects[0].id;
               }
-          } else {
-              setFormSubject(subjects[0]?.id || '');
           }
+          setFormSubject(subjectToSet);
 
           if (data.date === 'today') setFormDate(format(new Date(), 'yyyy-MM-dd'));
           else if (data.date === 'tomorrow') setFormDate(format(addDays(new Date(), 1), 'yyyy-MM-dd'));
@@ -106,7 +114,7 @@ export const Tasks: React.FC = () => {
       const newTask: Task = {
           id: editingTask ? editingTask.id : Date.now().toString(),
           title: formTitle,
-          subjectId: formSubject || subjects[0]?.id,
+          subjectId: formSubject || (subjects.length > 0 ? subjects[0].id : 'general'),
           dueDate: formDate,
           priority: formPriority,
           type: formType,
@@ -138,7 +146,7 @@ export const Tasks: React.FC = () => {
       } else {
           setEditingTask(null);
           setFormTitle('');
-          setFormSubject(subjects[0]?.id || '');
+          setFormSubject(subjects.length > 0 ? subjects[0].id : '');
           setFormDate(format(addDays(new Date(), 1), 'yyyy-MM-dd'));
           setFormPriority('medium');
           setFormType(TaskType.HOMEWORK);
@@ -201,7 +209,7 @@ export const Tasks: React.FC = () => {
                               </h3>
                           </div>
                           <div className="flex flex-wrap items-center gap-2">
-                               <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white" style={{backgroundColor: sub?.color}}>{sub?.name}</span>
+                               <span className="text-[10px] font-bold px-2 py-0.5 rounded text-white" style={{backgroundColor: sub?.color || '#ccc'}}>{sub?.name || 'Geral'}</span>
                                <PriorityBadge priority={task.priority || 'low'} />
                                {task.timeSpent && task.timeSpent > 0 ? (
                                    <span className="flex items-center text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">
