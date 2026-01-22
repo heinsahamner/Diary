@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, Calendar, GraduationCap, CheckSquare, BarChart2, Settings, MoreHorizontal, X } from 'lucide-react';
 
 const NavItem: React.FC<{ to: string; icon: React.ReactNode; label: string }> = ({ to, icon, label }) => {
@@ -35,6 +35,20 @@ const MobileMenuItem: React.FC<{ to: string; icon: React.ReactNode; label: strin
 
 export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+      const action = searchParams.get('action');
+      if (action === 'create' && location.pathname === '/') {
+          navigate({
+              pathname: '/tasks',
+              search: searchParams.toString()
+          }, { replace: true });
+      }
+  }, [searchParams, location, navigate]);
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-[#f8fafc] dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-200">
@@ -56,7 +70,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
         </nav>
         
         <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
-            <p className="text-xs text-center text-gray-400">v2.0.2 • Diary</p>
+            <p className="text-xs text-center text-gray-400">v3.2.1 • Student Planner</p>
         </div>
       </aside>
 

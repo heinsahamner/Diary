@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { StoreProvider } from './services/store';
 import { ToastProvider } from './components/Toast';
 import { Layout } from './components/Layout';
@@ -67,7 +67,7 @@ function App() {
   return (
     <ToastProvider>
       <StoreProvider user={user} onLogout={handleLogout}>
-        <MemoryRouter>
+        <BrowserRouter>
           <Layout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
@@ -87,7 +87,7 @@ function App() {
                   release={currentRelease} 
               />
           )}
-        </MemoryRouter>
+        </BrowserRouter>
       </StoreProvider>
     </ToastProvider>
   );
