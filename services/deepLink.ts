@@ -5,7 +5,7 @@ export interface DeepLinkIntent<T = any> {
 }
 
 export const DeepLinkService = {
-
+    
     parseIntent: <T = any>(searchParams: URLSearchParams): DeepLinkIntent<T> | null => {
         const action = searchParams.get('action');
         if (!action) return null;
@@ -16,10 +16,19 @@ export const DeepLinkService = {
         if (payload) {
             try {
                 const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-                const json = atob(base64);
+                
+                const binaryString = atob(base64);
+
+                const json = decodeURIComponent(escape(binaryString));
+                
                 data = JSON.parse(json);
             } catch (e) {
                 console.error('DeepLink: Failed to parse payload', e);
+                try {
+                    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+                    data = JSON.parse(atob(base64));
+                } catch (e2) {
+                }
             }
         }
 
@@ -43,8 +52,11 @@ export const DeepLinkService = {
         if (payload) {
             try {
                 const json = JSON.stringify(payload);
-                const base64 = btoa(json);
-                urlParams.set('payload', base64);
+                
+                const base64 = btoa(unescape(encodeURIComponent(json)));
+                
+                const urlSafeBase64 = base64.replace(/\+/g, '-').replace(/\//g, '_');
+                urlParams.set('payload', urlSafeBase64);
             } catch (e) {
                 console.error('DeepLink: Failed to encode payload', e);
             }
