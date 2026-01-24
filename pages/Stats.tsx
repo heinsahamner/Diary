@@ -62,8 +62,9 @@ export const Stats: React.FC = () => {
          
          validations.forEach(val => {
              const d = new Date(val.date + 'T00:00:00').getDay();
-             const slots = schedule.filter(s => s.dayOfWeek === d && s.subjectId === sub.id);
-             
+             const daySlots = val.archivedSchedule || schedule.filter(s => s.dayOfWeek === d);
+             const slots = daySlots.filter(s => s.subjectId === sub.id);
+
              slots.forEach(slot => {
                  const log = logs.find(l => l.date === val.date && l.slotId === slot.id);
                  if (log?.status === ClassStatus.CANCELED) return;

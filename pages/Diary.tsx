@@ -1,14 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { useToast } from '../components/Toast';
 import { format, addDays, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Slash, RefreshCw, Lock, Unlock, ArrowRightLeft, StickyNote, Save, Calendar as CalendarIcon, RotateCcw, Clock, AlertOctagon, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Slash, RefreshCw, Lock, Unlock, ArrowRightLeft, StickyNote, Save, Calendar as CalendarIcon, RotateCcw, Clock, AlertOctagon, ShieldCheck, Trash2 } from 'lucide-react';
 import { ClassLog, ClassStatus, SubjectType, ScheduleSlot } from '../types';
 import { useSearchParams } from 'react-router-dom';
 
 export const Diary: React.FC = () => {
-  const { schedule, subjects, logs, validations, validateDay, lockDay, logClass, settings, specialDays } = useStore();
+  const { schedule, subjects, logs, validations, validateDay, lockDay, invalidateDay, logClass, settings, specialDays } = useStore();
   const { addToast } = useToast();
   const [searchParams] = useSearchParams();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -29,34 +30,47 @@ export const Diary: React.FC = () => {
   const [noteText, setNoteText] = useState('');
 
   const dateKey = format(currentDate, 'yyyy-MM-dd');
-  const dayOfWeek = currentDate.getDay();
+  const dayOfWeek = currentDate.getDay(); 
   
   const validation = validations.find(v => v.date === dateKey);
   const isActive = validation && !validation.isLocked;
   const isLocked = validation && validation.isLocked;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isNotStarted = !validation;
-
-  const specialDay = specialDays.find(sd => sd.date === dateKey);
 
   let dailySlots: ScheduleSlot[] = [];
 
-  if (specialDay) {
-      dailySlots = specialDay.customSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+  if (validation?.archivedSchedule) {
+      dailySlots = validation.archivedSchedule;
   } else {
-      dailySlots = schedule
-        .filter(s => s.dayOfWeek === dayOfWeek)
-        .sort((a, b) => a.startTime.localeCompare(b.startTime));
+      const specialDay = specialDays.find(sd => sd.date === dateKey);
+      if (specialDay) {
+          dailySlots = specialDay.customSlots;
+      } else {
+          dailySlots = schedule.filter(s => s.dayOfWeek === dayOfWeek);
+      }
   }
+  
+  dailySlots = [...dailySlots].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+  const specialDay = specialDays.find(sd => sd.date === dateKey);
 
   const handleValidateDay = () => {
     validateDay(dateKey);
-    addToast(isLocked ? 'Dia destrancado. Edições permitidas.' : 'Dia iniciado!', 'success');
+    addToast(isLocked ? 'Dia destrancado. Edições permitidas.' : 'Dia letivo iniciado!', 'success');
   };
 
   const handleLockDay = () => {
-    if (window.confirm('🔒 Trancar este dia?\n\nA grade será ocultada e as edições bloqueadas.')) {
+    if (window.confirm('🔒 Trancar este dia?\n\nA grade será "congelada" e as edições bloqueadas. O histórico será preservado.')) {
         lockDay(dateKey);
-        addToast('Dia trancado com sucesso.', 'info');
+        addToast('Dia trancado e arquivado com sucesso.', 'info');
+    }
+  };
+
+  const handleResetDay = () => {
+    if (window.confirm('⚠️ Reiniciar este dia?\n\nIsso apagará o registro de "Dia Letivo" e as faltas/presenças deixarão de contar nas estatísticas até que você inicie o dia novamente.')) {
+        invalidateDay(dateKey);
+        addToast('Dia reiniciado para estado "Não Iniciado".', 'info');
     }
   };
 
@@ -180,6 +194,16 @@ export const Diary: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto justify-center md:justify-end border-t md:border-t-0 border-gray-100 dark:border-gray-700 pt-3 md:pt-0 relative z-50">
+            {validation && (
+                <button
+                    onClick={handleResetDay}
+                    className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-400 rounded-full transition-colors"
+                    title="Reiniciar Dia (Apagar registros)"
+                >
+                    <RefreshCw size={18} />
+                </button>
+            )}
+            
             {isActive && (
                 <button
                     onClick={handleLockDay}
@@ -392,8 +416,8 @@ export const Diary: React.FC = () => {
            
            <p className={`text-sm max-w-sm mx-auto mb-8 leading-relaxed ${isLocked ? 'text-red-600/80 dark:text-red-300/70' : 'text-gray-500 dark:text-gray-400'}`}>
              {isLocked
-                ? 'Este dia foi trancado manualmente. Suas presenças estão salvas, mas a edição está bloqueada.' 
-                : 'As aulas deste dia estão bloqueadas. Inicie o dia para liberar o registro de presenças.'}
+                ? 'Este dia foi trancado manualmente. A grade foi salva e o histórico preservado.' 
+                : 'As aulas deste dia estão bloqueadas. Inicie o dia letivo para liberar o registro de presenças.'}
            </p>
            
            {dailySlots.length > 0 ? (
@@ -406,7 +430,7 @@ export const Diary: React.FC = () => {
                `}
              >
                {isLocked ? <Unlock size={18} /> : null}
-               {isLocked ? 'Destrancar Dia' : 'Iniciar Dia'}
+               {isLocked ? 'Destrancar Dia' : 'Iniciar Dia Letivo'}
              </button>
            ) : (
              <p className="text-sm font-medium text-orange-500">Sem aulas programadas para este dia.</p>

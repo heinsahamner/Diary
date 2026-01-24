@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, SystemSettings, SubjectType, SubjectCategory, SpecialDay } from '../types';
 import { DBService } from './db';
@@ -10,7 +11,7 @@ const cleanState: AppState = {
     { 
         id: 'reposicao', 
         name: 'Reposição', 
-        color: '#8b5cf6',
+        color: '#8b5cf6', 
         totalClasses: 0, 
         type: SubjectType.ORGANIZATIONAL, 
         category: SubjectCategory.OTHER 
@@ -134,13 +135,39 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
   const validateDay = (date: string) => setState(prev => {
       const existing = prev.validations.find(v => v.date === date);
+      
+      const special = prev.specialDays.find(s => s.date === date);
+      let snapshot: ScheduleSlot[] = [];
+      
+      if (special) {
+          snapshot = special.customSlots;
+      } else {
+          const [y, m, d] = date.split('-').map(Number);
+          const dateObj = new Date(y, m - 1, d);
+          const dow = dateObj.getDay();
+          snapshot = prev.schedule.filter(s => s.dayOfWeek === dow);
+      }
+
       if (existing) {
           return {
               ...prev,
-              validations: prev.validations.map(v => v.date === date ? { ...v, isLocked: false } : v)
+              validations: prev.validations.map(v => v.date === date ? { 
+                  ...v, 
+                  isLocked: false,
+                  archivedSchedule: v.archivedSchedule || snapshot 
+              } : v)
           };
       }
-      return { ...prev, validations: [...prev.validations, { date, isValidated: true, isLocked: false }] };
+      
+      return { 
+          ...prev, 
+          validations: [...prev.validations, { 
+              date, 
+              isValidated: true, 
+              isLocked: false,
+              archivedSchedule: snapshot
+          }] 
+      };
   });
 
   const lockDay = (date: string) => setState(prev => ({

@@ -2,12 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { useStore } from '../services/store';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ClassStatus, TaskStatus } from '../types';
+import { ClassStatus, TaskStatus, ScheduleSlot } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Circle, CheckCircle, XCircle, Slash, Calendar as CalendarIcon, ArrowRight, CheckSquare } from 'lucide-react';
 
 export const CalendarView: React.FC = () => {
-    const { validations, logs, tasks, subjects } = useStore();
+    const { validations, logs, tasks, subjects, schedule, specialDays } = useStore();
     const navigate = useNavigate();
     
     const [displayDate, setDisplayDate] = useState(new Date());
@@ -27,16 +27,31 @@ export const CalendarView: React.FC = () => {
         return tasks.filter(t => isSameDay(new Date(t.dueDate), selectedDate));
     }, [tasks, selectedDate]);
 
-    const isDayValidated = validations.some(v => v.date === selectedDateKey);
+    const validation = validations.find(v => v.date === selectedDateKey);
+    const isDayValidated = !!validation;
+
+    const agendaSlots = useMemo(() => {
+        if (!isDayValidated) return [];
+        
+        if (validation?.archivedSchedule) {
+            return validation.archivedSchedule;
+        }
+
+        const specialDay = specialDays.find(sd => sd.date === selectedDateKey);
+        if (specialDay) return specialDay.customSlots;
+
+        const dow = selectedDate.getDay();
+        return schedule.filter(s => s.dayOfWeek === dow).sort((a,b) => a.startTime.localeCompare(b.startTime));
+    }, [isDayValidated, validation, selectedDateKey, specialDays, selectedDate, schedule]);
 
     const monthStats = useMemo(() => {
-        const monthLogs = logs.filter(l => l.date.startsWith(format(displayDate, 'yyyy-MM')));
-        const validLogs = monthLogs.filter(l => l.status !== ClassStatus.CANCELED);
-        const presentLogs = validLogs.filter(l => l.status === ClassStatus.PRESENT || l.status === ClassStatus.SUBSTITUTED).length;
-        const attRate = validLogs.length > 0 ? Math.round((presentLogs / validLogs.length) * 100) : 100;
+    const monthLogs = logs.filter(l => l.date.startsWith(format(displayDate, 'yyyy-MM')));
+    const validLogs = monthLogs.filter(l => l.status !== ClassStatus.CANCELED);
+    const presentLogs = validLogs.filter(l => l.status === ClassStatus.PRESENT || l.status === ClassStatus.SUBSTITUTED).length;
+    const attRate = validLogs.length > 0 ? Math.round((presentLogs / validLogs.length) * 100) : 100;
 
-        const monthTasks = tasks.filter(t => isSameMonth(new Date(t.dueDate), displayDate));
-        const pendingTasks = monthTasks.filter(t => t.status !== TaskStatus.COMPLETED).length;
+    const monthTasks = tasks.filter(t => isSameMonth(new Date(t.dueDate), displayDate));
+    const pendingTasks = monthTasks.filter(t => t.status !== TaskStatus.COMPLETED).length;
 
         return { attRate, pendingTasks };
     }, [logs, tasks, displayDate]);
@@ -165,22 +180,34 @@ export const CalendarView: React.FC = () => {
                         </div>
                      </div>
 
-                     {dailyLogs.length > 0 ? (
-                         dailyLogs.map(log => {
-                             const sub = subjects.find(s => s.id === log.actualSubjectId);
+                     {agendaSlots.length > 0 ? (
+                         agendaSlots.map(slot => {
+                             const log = dailyLogs.find(l => l.slotId === slot.id);
+                             
+                             const status = log?.status || ClassStatus.PRESENT; 
+                             const currentSubId = log?.actualSubjectId || slot.subjectId;
+                             const sub = subjects.find(s => s.id === currentSubId);
+
                              let icon = <CheckCircle size={14} />;
                              let colorClass = 'bg-green-500';
-                             if(log.status === ClassStatus.ABSENT) { icon = <XCircle size={14} />; colorClass = 'bg-red-500'; }
-                             if(log.status === ClassStatus.CANCELED) { icon = <Slash size={14} />; colorClass = 'bg-gray-400'; }
+                             
+                             if(status === ClassStatus.ABSENT) { icon = <XCircle size={14} />; colorClass = 'bg-red-500'; }
+                             else if(status === ClassStatus.CANCELED) { icon = <Slash size={14} />; colorClass = 'bg-gray-400'; }
+                             else if(!isDayValidated) { icon = <Circle size={14} />; colorClass = 'bg-gray-300 dark:bg-gray-600'; }
 
                              return (
-                                 <div key={log.id} className="flex items-center gap-4 group">
+                                 <div key={slot.id} className="flex items-center gap-4 group">
                                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border-4 border-gray-50 dark:border-gray-900 text-white ${colorClass}`}>
                                          {icon}
                                      </div>
                                      <div className="bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex-1">
                                          <p className="font-bold text-sm text-gray-800 dark:text-white">{sub?.name}</p>
-                                         <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{log.status === ClassStatus.PRESENT ? 'Presente' : log.status}</p>
+                                         <div className="flex justify-between items-center">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                                                {isDayValidated ? (status === ClassStatus.PRESENT ? 'Presente' : status) : slot.startTime}
+                                            </p>
+                                            {!isDayValidated && <span className="text-[10px] text-gray-400 italic">Planejado</span>}
+                                         </div>
                                      </div>
                                  </div>
                              )

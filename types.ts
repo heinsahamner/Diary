@@ -76,7 +76,8 @@ export interface ClassLog {
 export interface DayValidation {
   date: string; 
   isValidated: boolean; 
-  isLocked?: boolean; 
+  isLocked?: boolean;
+  archivedSchedule?: ScheduleSlot[];
 }
 
 export interface Assessment {
