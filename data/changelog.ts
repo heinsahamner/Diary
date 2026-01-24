@@ -1,5 +1,5 @@
 
-export const CURRENT_VERSION = '2.0.2';
+export const CURRENT_VERSION = '2.0.3';
 
 export interface ChangeLogItem {
     type: 'feature' | 'fix' | 'improvement' | 'style';
