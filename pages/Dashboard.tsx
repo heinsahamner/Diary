@@ -6,15 +6,17 @@ import { ptBR } from 'date-fns/locale';
 import { 
     CalendarCheck, AlertCircle, Clock, CheckCircle, XCircle, 
     ArrowRight, TrendingUp, BookOpen, MoreHorizontal, MapPin, 
-    Sun, Moon, Sunrise
+    Sun, Moon, Sunrise, HelpCircle
 } from 'lucide-react';
 import { TaskStatus, ClassStatus, SubjectType } from '../types';
 import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Tutorial } from '../components/Tutorial';
 
 export const Dashboard: React.FC = () => {
   const { tasks, validations, schedule, subjects, logs, logClass, assessments, settings, currentUser } = useStore();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   useEffect(() => {
       const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -117,6 +119,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fade-in pb-20">
+    <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl"></div>
@@ -318,6 +321,23 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+
+                <button 
+                  onClick={() => setIsTutorialOpen(true)}
+                  className="col-span-2 bg-purple-50 dark:bg-purple-900/20 p-4 rounded-2xl border border-purple-100 dark:border-purple-900/50 hover:shadow-md transition-all flex items-center justify-between group text-left"
+               >
+                   <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 bg-white dark:bg-purple-900 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-400">
+                           <HelpCircle size={20} />
+                       </div>
+                       <div>
+                           <span className="font-bold text-purple-800 dark:text-purple-300 text-sm block">Como usar o App</span>
+                           <span className="text-xs text-purple-600 dark:text-purple-400 opacity-80">Aprenda a marcar faltas e mais</span>
+                       </div>
+                   </div>
+                   <ArrowRight size={18} className="text-purple-400 group-hover:translate-x-1 transition-transform" />
+               </button>
+
                <Link to="/grades" className="bg-emerald-50 dark:bg-emerald-900/20 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/50 hover:shadow-md transition-all flex flex-col justify-center items-center text-center group">
                    <div className="w-10 h-10 bg-white dark:bg-emerald-900 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-2 group-hover:scale-110 transition-transform">
                        <TrendingUp size={20} />

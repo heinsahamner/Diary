@@ -31,15 +31,15 @@ export const CHANGELOG: Release[] = [
                 type: 'style',
                 title: 'Abas novas na seção "Notas',
                 description: 'Adicionar matérias via aba "Notas" e uma nova aba de cards das notas.',
-                contributor: 'Lucas Willian, Helena',
-                contributorRole: 'Design'
+                contributor: 'Lucas Willian & Helena',
+                contributorRole: 'Sugestão & Design'
             },
             {
                 type: 'improvement',
-                title: 'Nova aba início',
-                description: 'Saudação dinâmica baseada no horário e visualização de timeline melhorada.',
-                contributor: 'Lucas Willian',
-                contributorRole: 'Feedback'
+                title: 'Tutorial',
+                description: 'Na aba ínicio, agora um pequeno tutorial uso.',
+                contributor: 'Lucas Willian & Helena',
+                contributorRole: 'Design & Sugestão'
             },
             {
                 type: 'improvement',
