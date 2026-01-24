@@ -233,7 +233,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </div>
             
             <div className="absolute bottom-4 text-xs text-gray-400 dark:text-gray-600">
-                v2.0.2 • Diary, from Microspace.
+                v2.0.3 • Diary, from Microspace.
             </div>
         </div>
     );

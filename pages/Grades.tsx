@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../services/store';
 import { TRIMESTERS } from '../constants';
-import { Plus, Trash2, Calculator, Star, TrendingUp, GraduationCap, AlertTriangle, BookOpen, Target, X, LayoutGrid, List, Pencil, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, Calculator, Star, TrendingUp, GraduationCap, AlertTriangle, BookOpen, Target, X, LayoutGrid, List, Pencil, ChevronRight, ArrowLeft, LayoutTemplate } from 'lucide-react';
 import { Assessment, SubjectType, GradingSystem, Subject, ClassStatus } from '../types';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | undefined, trimester: number | null, method: 'running' | 'absolute', globalGradingSystem: GradingSystem) => {
     if (!subject) return 0;
@@ -54,9 +55,10 @@ const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | u
 };
 
 export const Grades: React.FC = () => {
-  const { subjects, assessments, addAssessment, removeAssessment, updateAssessment, settings, logs, schedule, validations } = useStore(); 
+  const { subjects, assessments, addAssessment, removeAssessment, updateAssessment, settings, logs, schedule, validations } = useStore();
+  const navigate = useNavigate();
   
-  const [viewMode, setViewMode] = useState<'overview' | 'detail'>('overview');
+  const [viewMode, setViewMode] = useState<'overview' | 'detail' | 'cards'>('overview');
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>(subjects.find(s => s.type === SubjectType.NORMAL)?.id || '');
   const [activeTrimester, setActiveTrimester] = useState<number>(1);
   const [showSimulator, setShowSimulator] = useState(false);
@@ -68,12 +70,12 @@ export const Grades: React.FC = () => {
   const [newValue, setNewValue] = useState('');
   const [newWeight, setNewWeight] = useState('1');
   const [isExtra, setIsExtra] = useState(false);
-
   
   const reportCard = useMemo(() => {
       return subjects
         .filter(s => s.type === SubjectType.NORMAL)
         .map(sub => {
+
             const t1 = calculateSubjectAverage(assessments, sub, 1, settings.gradeCalcMethod, settings.gradingSystem || 'average');
             const t2 = calculateSubjectAverage(assessments, sub, 2, settings.gradeCalcMethod, settings.gradingSystem || 'average');
             const t3 = calculateSubjectAverage(assessments, sub, 3, settings.gradeCalcMethod, settings.gradingSystem || 'average');
@@ -170,6 +172,10 @@ export const Grades: React.FC = () => {
       setViewMode('detail');
   };
 
+  const handleAddNewSubject = () => {
+      navigate('/settings?action=new_subject');
+  };
+
   const simulationResult = useMemo(() => {
       if(!currentSubject) return null;
       
@@ -199,22 +205,38 @@ export const Grades: React.FC = () => {
 
   return (
     <div className="pb-20 space-y-6">
-      <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Boletim (Notas)</h1>
-          <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Boletim Escolar</h1>
+              <button 
+                onClick={handleAddNewSubject}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-2 shadow-lg shadow-indigo-200 dark:shadow-none transition-all hover:scale-110 active:scale-95"
+                title="Adicionar Matéria"
+              >
+                  <Plus size={20} />
+              </button>
+          </div>
+          <div className="flex bg-gray-200 dark:bg-gray-700 p-1 rounded-xl w-full md:w-auto">
               <button 
                 onClick={() => setViewMode('overview')}
-                className={`p-2 rounded-lg transition-all ${viewMode === 'overview' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`flex-1 md:flex-none p-2 rounded-lg transition-all ${viewMode === 'overview' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
                 title="Visão Geral"
               >
-                  <LayoutGrid size={20} />
+                  <LayoutGrid size={20} className="mx-auto md:mx-0" />
+              </button>
+              <button 
+                onClick={() => setViewMode('cards')}
+                className={`flex-1 md:flex-none p-2 rounded-lg transition-all ${viewMode === 'cards' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+                title="Cartões"
+              >
+                  <LayoutTemplate size={20} className="mx-auto md:mx-0" />
               </button>
               <button 
                 onClick={() => setViewMode('detail')}
-                className={`p-2 rounded-lg transition-all ${viewMode === 'detail' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+                className={`flex-1 md:flex-none p-2 rounded-lg transition-all ${viewMode === 'detail' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
                 title="Detalhes"
               >
-                  <List size={20} />
+                  <List size={20} className="mx-auto md:mx-0" />
               </button>
           </div>
       </div>
@@ -297,6 +319,68 @@ export const Grades: React.FC = () => {
           </div>
       )}
 
+      {viewMode === 'cards' && (
+          <div className="animate-fade-in grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {reportCard.map(row => (
+                  <div 
+                    key={row.subject.id}
+                    onClick={() => handleSubjectSelect(row.subject.id)}
+                    className="relative rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all cursor-pointer group hover:scale-[1.02]"
+                    style={{ backgroundColor: row.subject.color }}
+                  >
+                      <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-transparent pointer-events-none" />
+                      <div className="absolute -right-6 -top-6 w-32 h-32 bg-white opacity-20 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
+
+                      <div className="relative p-6 text-white h-full flex flex-col justify-between">
+                          <div>
+                              <div className="flex justify-between items-start mb-4">
+                                  <h3 className="text-xl font-bold leading-tight drop-shadow-md">{row.subject.name}</h3>
+                                  <ChevronRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                              
+                              <div className="flex gap-2 mb-6">
+                                  <div className="flex flex-col items-center bg-black/20 backdrop-blur-sm rounded-lg px-2 py-1 min-w-[3rem]">
+                                      <span className="text-[10px] uppercase font-bold opacity-70">T1</span>
+                                      <span className="font-bold text-lg">{row.t1 > 0 ? row.t1.toFixed(1) : '-'}</span>
+                                  </div>
+                                  <div className="flex flex-col items-center bg-black/20 backdrop-blur-sm rounded-lg px-2 py-1 min-w-[3rem]">
+                                      <span className="text-[10px] uppercase font-bold opacity-70">T2</span>
+                                      <span className="font-bold text-lg">{row.t2 > 0 ? row.t2.toFixed(1) : '-'}</span>
+                                  </div>
+                                  <div className="flex flex-col items-center bg-black/20 backdrop-blur-sm rounded-lg px-2 py-1 min-w-[3rem]">
+                                      <span className="text-[10px] uppercase font-bold opacity-70">T3</span>
+                                      <span className="font-bold text-lg">{row.t3 > 0 ? row.t3.toFixed(1) : '-'}</span>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <div>
+                              <div className="flex justify-between text-xs font-bold mb-1 opacity-90">
+                                  <span>Frequência</span>
+                                  <span>{Math.round(row.attendance)}%</span>
+                              </div>
+                              <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden backdrop-blur-sm">
+                                  <div 
+                                    className={`h-full rounded-full transition-all duration-500 ${row.attendance < 75 ? 'bg-red-400' : 'bg-white'}`}
+                                    style={{width: `${row.attendance}%`}}
+                                  />
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              ))}
+              <button 
+                onClick={handleAddNewSubject}
+                className="rounded-3xl border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center p-6 text-gray-400 hover:text-indigo-500 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all min-h-[200px] group"
+              >
+                  <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 flex items-center justify-center mb-3 transition-colors">
+                      <Plus size={24} className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+                  </div>
+                  <span className="font-bold">Nova Matéria</span>
+              </button>
+          </div>
+      )}
+
       {viewMode === 'detail' && currentSubject && (
         <div className="animate-fade-in space-y-6">
             
@@ -316,6 +400,13 @@ export const Grades: React.FC = () => {
                         <span className="font-bold text-sm">{sub.name}</span>
                     </button>
                 ))}
+                <button 
+                    onClick={handleAddNewSubject}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl border border-dashed border-gray-300 text-gray-400 hover:text-indigo-500 hover:border-indigo-300 hover:bg-indigo-50 transition-all whitespace-nowrap flex-shrink-0"
+                >
+                    <Plus size={16} />
+                    <span className="font-bold text-sm">Adicionar</span>
+                </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

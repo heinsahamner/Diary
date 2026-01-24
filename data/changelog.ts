@@ -17,8 +17,8 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
     {
-        version: '2.0.2',
-        date: '2026-01-19',
+        version: '2.0.3',
+        date: '2026-01-24',
         items: [
             {
                 type: 'feature',
@@ -29,9 +29,9 @@ export const CHANGELOG: Release[] = [
             },
             {
                 type: 'style',
-                title: 'Modo Compacto',
-                description: 'Nova opção nos ajustes para reduzir o tamanho dos itens nas listas.',
-                contributor: 'Lucas Willian',
+                title: 'Abas novas na seção "Notas',
+                description: 'Adicionar matérias via aba "Notas" e uma nova aba de cards das notas.',
+                contributor: 'Lucas Willian, Helena',
                 contributorRole: 'Design'
             },
             {

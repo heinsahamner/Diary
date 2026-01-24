@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { useToast } from '../components/Toast';
 import { SubjectType, Subject, ScheduleSlot, GradingSystem, SubjectCategory, SpecialDay } from '../types';
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { DAYS_OF_WEEK, PREDEFINED_GRADEBOOKS, MOCK_SPECIAL_DAYS, OFFICIAL_SATURDAY_CALENDAR } from '../constants';
 import { DBService } from '../services/db';
+import { useSearchParams } from 'react-router-dom';
 
 const SettingsGroup: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div className="mb-6">
@@ -54,6 +55,7 @@ const SettingsItem: React.FC<{
 export const Settings: React.FC = () => {
   const { subjects, addSubject, updateSubject, removeSubject, schedule, updateSchedule, settings, updateSettings, importData, currentUser, logout, specialDays, addSpecialDay, removeSpecialDay } = useStore();
   const { addToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [activeTab, setActiveTab] = useState<'account' | 'appearance' | 'academic' | 'subjects' | 'schedule' | 'backup' | 'about'>('account');
   
@@ -65,8 +67,8 @@ export const Settings: React.FC = () => {
   const [selectedPresetCourse, setSelectedPresetCourse] = useState<string | null>(null);
 
   const [activeScheduleDay, setActiveScheduleDay] = useState(1);
-  const [newSlotStart, setNewSlotStart] = useState('07:00');
-  const [newSlotEnd, setNewSlotEnd] = useState('07:50');
+  const [newSlotStart, setNewSlotStart] = useState('07:30');
+  const [newSlotEnd, setNewSlotEnd] = useState('08:20');
   const [newSlotSubject, setNewSlotSubject] = useState('');
 
   const [newSpecialDate, setNewSpecialDate] = useState('');
@@ -96,6 +98,15 @@ export const Settings: React.FC = () => {
       }
       setIsSubjectModalOpen(true);
   };
+
+    useEffect(() => {
+      const action = searchParams.get('action');
+      if (action === 'new_subject') {
+          setActiveTab('subjects');
+          openSubjectModal();
+          setSearchParams({}, { replace: true });
+      }
+  }, [searchParams, setSearchParams]);
 
   const handleSubjectSave = (e: React.FormEvent) => {
       e.preventDefault();
@@ -372,7 +383,7 @@ export const Settings: React.FC = () => {
                   <SettingsItem 
                     icon={<Info size={20} />} 
                     label="Sobre" 
-                    value="v2.0.2" 
+                    value="v2.0.3" 
                     onClick={() => setActiveTab('about')} 
                   />
               </SettingsGroup>
@@ -1008,7 +1019,7 @@ export const Settings: React.FC = () => {
             </SettingsGroup>
 
             <div className="text-center pt-8 pb-4">
-                <p className="text-xs text-gray-400 font-medium">Versão 2.0.2</p>
+                <p className="text-xs text-gray-400 font-medium">Versão 2.0.3</p>
                 <p className="text-[10px] text-gray-300 dark:text-gray-600 mt-1">© {new Date().getFullYear()}</p>
             </div>
         </div>
