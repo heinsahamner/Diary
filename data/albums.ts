@@ -1,3 +1,6 @@
+import coverFrom from '/src/assets/OST/Covers/From.jpeg';
+import songForget from '/src/assets/OST/Songs/forget-about-it.mp3';
+import songTrouble from '/src/assets/OST/Songs/two-in-trouble.mp3';
 
 export interface Track {
     id: string;
@@ -11,19 +14,21 @@ export interface Album {
     id: string;
     title: string;
     artist: string;
-    cover: string;
+    cover: string; 
     tracks: Track[];
+    accentColor: string; 
 }
 
 export const ALBUMS: Album[] = [
     {
-        id: '1',
+        id: 'indie-1',
         title: 'From',
         artist: 'Lu',
-        cover: 'OST/From.jpeg',
+        cover: coverFrom,
+        accentColor: '#6366f1',
         tracks: [
-            { id: '1-1', title: 'forget about it', artist: 'Lu', duration: '02:22', file: 'OST/Songs/forget about it.mp3' },
-            { id: '1-2', title: 'two in trouble', artist: 'Lu', duration: '02:42', file: 'OST/Songs/two in trouble.mp3' }
+            { id: 't1', title: 'forget about it', artist: 'Lu', duration: '02:22', file: songForget },
+            { id: 't2', title: 'two in trouble', artist: 'Lu', duration: '02:42', file: songTrouble }
         ]
     }
 ];
