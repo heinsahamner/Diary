@@ -175,8 +175,7 @@ export const Notes: React.FC = () => {
 
             <button 
                 onClick={() => handleOpenForm()}
-                className="fixed bottom-6 right-6 w-16 h-16 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-xl shadow-indigo-600/30 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-40"
-            >
+                className="fixed bottom-[96px] sm:bottom-6 right-6 w-16 h-16 sm:w-16 sm:h-16 bg-indigo-600 hover:bg-indigo-700 text-white rounded-3xl shadow-xl shadow-indigo-600/30 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-40">
                 <Plus size={32} />
             </button>
 

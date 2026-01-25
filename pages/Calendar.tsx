@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../services/store';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, someMonths, isToday, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, isToday, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ClassStatus, TaskStatus, ScheduleSlot } from '../types';
 // @ts-ignore

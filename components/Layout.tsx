@@ -69,7 +69,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
           <NavItem to="/settings" icon={<Settings size={20} />} label="Ajustes" />
         </nav>
         <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800 text-xs text-center text-gray-400">
-            v2.2.0 • Diary
+            v2.3.0 • Diary
         </div>
       </aside>
 

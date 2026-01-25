@@ -1,8 +1,8 @@
 
 export enum SubjectType {
-  NORMAL = 'Normal', 
-  ORGANIZATIONAL = 'Organizational', 
-  EXTENSION = 'Extension',
+  NORMAL = 'Normal', // Counts grade and absence
+  ORGANIZATIONAL = 'Organizational', // Visual only (Lunch, Break)
+  EXTENSION = 'Extension', // Counts presence, no global average
 }
 
 export enum SubjectCategory {
@@ -17,8 +17,8 @@ export enum SubjectCategory {
 export enum ClassStatus {
   PRESENT = 'Present',
   ABSENT = 'Absent',
-  CANCELED = 'Canceled', 
-  SUBSTITUTED = 'Substituted',
+  CANCELED = 'Canceled', // Does not count towards total
+  SUBSTITUTED = 'Substituted', // Logic handled by swap
 }
 
 export enum TaskType {
@@ -133,6 +133,7 @@ export interface SystemSettings {
   gradeCalcMethod: GradeCalcMethod;
   gradingSystem: GradingSystem;
   currentYear: number;
+  lastModified?: string;
 }
 
 export interface AppState {

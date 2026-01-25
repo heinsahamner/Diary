@@ -4,7 +4,11 @@ import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidatio
 import { DBService } from './db';
 import { Loader2 } from 'lucide-react';
 
-const StoreContext = createContext<AppContextType | undefined>(undefined);
+interface ExtendedAppContext extends AppContextType {
+    getCurrentState?: () => AppState;
+}
+
+const StoreContext = createContext<ExtendedAppContext | undefined>(undefined);
 
 const cleanState: AppState = {
   subjects: [
@@ -26,7 +30,8 @@ const cleanState: AppState = {
     passingGrade: 6.0,
     gradeCalcMethod: 'absolute',
     gradingSystem: 'average',
-    currentYear: new Date().getFullYear()
+    currentYear: new Date().getFullYear(),
+    lastModified: new Date().toISOString()
   }
 };
 
@@ -82,7 +87,16 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
   useEffect(() => {
     if (!isLoaded.current || loading) return;
-    DBService.saveState(user, activeYear, state).catch(err => console.error("Failed to auto-save", err));
+    
+    const stateToSave = {
+        ...state,
+        settings: {
+            ...state.settings,
+            lastModified: new Date().toISOString()
+        }
+    };
+
+    DBService.saveState(user, activeYear, stateToSave).catch(err => console.error("Failed to auto-save", err));
   }, [state, user, activeYear, loading]);
 
   useEffect(() => {
@@ -151,6 +165,8 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
   const resetData = () => setState({ ...cleanState, settings: { ...cleanState.settings, currentYear: activeYear } });
 
+  const getCurrentState = () => state;
+
   if (loading) {
       return (
           <div className="h-screen w-full flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -168,7 +184,8 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
       addSpecialDay, removeSpecialDay, validateDay, lockDay, invalidateDay,
       logClass, addAssessment, removeAssessment, updateAssessment,
       addTask, updateTask, deleteTask, addNote, updateNote, deleteNote,
-      updateSettings, importData, resetData, logout: onLogout
+      updateSettings, importData, resetData, logout: onLogout,
+      getCurrentState
     }}>
       {children}
     </StoreContext.Provider>

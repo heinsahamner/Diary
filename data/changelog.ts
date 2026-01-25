@@ -1,5 +1,5 @@
 
-export const CURRENT_VERSION = '2.2.0';
+export const CURRENT_VERSION = '2.3.0';
 
 export interface ChangeLogItem {
     type: 'feature' | 'fix' | 'improvement' | 'style';
@@ -17,7 +17,7 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
     {
-        version: '2.2.0',
+        version: '2.3.0',
         date: '2026-01-25',
         items: [
             {
@@ -45,6 +45,13 @@ export const CHANGELOG: Release[] = [
                 type: 'improvement',
                 title: 'Aba "Beats"',
                 description: 'Como já é tradição, deve sempre haver um player de música.',
+                contributor: 'Lucas Willian',
+                contributorRole: 'Implementação'
+            },
+            {
+                type: 'improvement',
+                title: 'Backup"',
+                description: 'Suporte a sincronização com a nuvem e login com Google.',
                 contributor: 'Lucas Willian',
                 contributorRole: 'Implementação'
             }
