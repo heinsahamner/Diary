@@ -16,12 +16,21 @@ root.render(
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    if (!window.isSecureContext) {
+      console.log('Service Worker registration skipped: App is not running in a secure context (HTTPS/localhost).');
+      return;
+    }
+
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
         console.log('ServiceWorker registration successful with scope: ', registration.scope);
       })
       .catch((err) => {
-        console.log('ServiceWorker registration failed: ', err);
+        if (err.name === 'SecurityError' || err.message?.includes('insecure')) {
+           console.log('ServiceWorker registration restricted by browser settings or environment.');
+        } else {
+           console.log('ServiceWorker registration failed: ', err);
+        }
       });
   });
 }

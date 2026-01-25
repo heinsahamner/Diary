@@ -9,6 +9,7 @@ import { Grades } from './pages/Grades';
 import { Stats } from './pages/Stats';
 import { Settings } from './pages/Settings';
 import { Tasks } from './pages/Tasks';
+import { Beats } from './pages/Beats';
 import { CalendarView } from './pages/Calendar';
 import { Login } from './components/Login';
 import { WhatsNewModal } from './components/WhatsNewModal';
@@ -76,6 +77,7 @@ function App() {
               <Route path="/stats" element={<Stats />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/tasks" element={<Tasks />} />
+              <Route path="/beats" element={<Beats />} />
               <Route path="/calendar" element={<CalendarView />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

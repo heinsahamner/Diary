@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Calendar, GraduationCap, CheckSquare, BarChart2, Settings, MoreHorizontal, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Calendar, GraduationCap, CheckSquare, BarChart2, Settings, MoreHorizontal, X, Music } from 'lucide-react';
 
 const NavItem: React.FC<{ to: string; icon: React.ReactNode; label: string }> = ({ to, icon, label }) => {
   const location = useLocation();
@@ -59,18 +59,19 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
           </div>
           <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">Diary</h1>
         </div>
-        <nav className="space-y-1.5 flex-1">
+        <nav className="space-y-1.5 flex-1 overflow-y-auto no-scrollbar">
           <NavItem to="/" icon={<LayoutDashboard size={20} />} label="Início" />
           <NavItem to="/diary" icon={<BookOpen size={20} />} label="Diário" />
           <NavItem to="/calendar" icon={<Calendar size={20} />} label="Calendário" />
           <NavItem to="/grades" icon={<GraduationCap size={20} />} label="Notas" />
           <NavItem to="/tasks" icon={<CheckSquare size={20} />} label="Tarefas" />
+          <NavItem to="/beats" icon={<Music size={20} />} label="Beats" />
           <NavItem to="/stats" icon={<BarChart2 size={20} />} label="Análise" />
           <NavItem to="/settings" icon={<Settings size={20} />} label="Ajustes" />
         </nav>
         
         <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
-            <p className="text-xs text-center text-gray-400">v2.0.3 • Diary</p>
+            <p className="text-xs text-center text-gray-400">v2.1.0 • Diary</p>
         </div>
       </aside>
 
@@ -89,6 +90,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
             <div className="md:hidden fixed bottom-[85px] right-4 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-2 min-w-[180px] z-40 origin-bottom-right animate-scale-in">
                 <div className="flex flex-col space-y-1">
                     <MobileMenuItem to="/calendar" icon={<Calendar size={18}/>} label="Calendário" onClick={() => setIsMoreMenuOpen(false)} />
+                    <MobileMenuItem to="/beats" icon={<Music size={18}/>} label="Beats" onClick={() => setIsMoreMenuOpen(false)} />
                     <MobileMenuItem to="/stats" icon={<BarChart2 size={18}/>} label="Análise" onClick={() => setIsMoreMenuOpen(false)} />
                     <div className="h-px bg-gray-100 dark:bg-gray-700 my-1" />
                     <MobileMenuItem to="/settings" icon={<Settings size={18}/>} label="Ajustes" onClick={() => setIsMoreMenuOpen(false)} />

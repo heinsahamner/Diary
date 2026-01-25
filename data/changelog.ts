@@ -1,5 +1,5 @@
 
-export const CURRENT_VERSION = '2.0.3';
+export const CURRENT_VERSION = '2.1.0';
 
 export interface ChangeLogItem {
     type: 'feature' | 'fix' | 'improvement' | 'style';
@@ -17,34 +17,36 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
     {
-        version: '2.0.3',
-        date: '2026-01-24',
+        version: '2.1.0',
+        date: '2026-01-25',
         items: [
             {
                 type: 'feature',
                 title: 'Sábados Letivos',
                 description: 'Agora você pode criar e gerenciar sábados letivos.',
                 contributor: 'Lucas Willian',
-                contributorRole: 'Sugestão'
+                contributorRole: 'Implementação'
             },
             {
-                type: 'style',
+                type: 'feature',
                 title: 'Abas novas na seção "Notas',
                 description: 'Adicionar matérias via aba "Notas" e uma nova aba de cards das notas.',
                 contributor: 'Lucas Willian & Helena',
-                contributorRole: 'Sugestão & Design'
+                contributorRole: 'Implementação & Sugestão'
             },
             {
                 type: 'improvement',
                 title: 'Tutorial',
                 description: 'Na aba ínicio, agora um pequeno tutorial uso.',
                 contributor: 'Lucas Willian & Helena',
-                contributorRole: 'Design & Sugestão'
+                contributorRole: 'Implementação & Sugestão'
             },
             {
                 type: 'improvement',
-                title: 'Ajustes de UX',
-                description: 'Reescrita de textos para linguagem mais natural e nova tela de Configurações.',
+                title: 'Aba "Beats"',
+                description: 'Como já é tradição, deve sempre haver um player de música.',
+                contributor: 'Lucas Willian',
+                contributorRole: 'Implementação'
             }
         ]
     }

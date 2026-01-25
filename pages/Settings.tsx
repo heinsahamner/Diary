@@ -383,7 +383,7 @@ export const Settings: React.FC = () => {
                   <SettingsItem 
                     icon={<Info size={20} />} 
                     label="Sobre" 
-                    value="v2.0.3" 
+                    value="v2.1.0" 
                     onClick={() => setActiveTab('about')} 
                   />
               </SettingsGroup>
@@ -1019,7 +1019,7 @@ export const Settings: React.FC = () => {
             </SettingsGroup>
 
             <div className="text-center pt-8 pb-4">
-                <p className="text-xs text-gray-400 font-medium">Versão 2.0.3</p>
+                <p className="text-xs text-gray-400 font-medium">Versão 2.1.0</p>
                 <p className="text-[10px] text-gray-300 dark:text-gray-600 mt-1">© {new Date().getFullYear()}</p>
             </div>
         </div>
