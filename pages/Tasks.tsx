@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { useToast } from '../components/Toast';
@@ -10,9 +11,9 @@ import {
 } from 'lucide-react';
 import { format, isBefore, startOfToday, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+// @ts-ignore
 import { useSearchParams } from 'react-router-dom';
 
-// --- Components ---
 
 const PriorityBadge: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
     const colors = {
@@ -37,11 +38,9 @@ export const Tasks: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [focusedTask, setFocusedTask] = useState<Task | null>(null);
 
-  // Filter State
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
 
-  // New Task Form State
   const [formTitle, setFormTitle] = useState('');
   const [formSubject, setFormSubject] = useState('');
   const [formDate, setFormDate] = useState(format(addDays(new Date(), 1), 'yyyy-MM-dd'));

@@ -1,5 +1,5 @@
 
-export const CURRENT_VERSION = '2.1.0';
+export const CURRENT_VERSION = '2.2.0';
 
 export interface ChangeLogItem {
     type: 'feature' | 'fix' | 'improvement' | 'style';
@@ -17,13 +17,13 @@ export interface Release {
 
 export const CHANGELOG: Release[] = [
     {
-        version: '2.1.0',
+        version: '2.2.0',
         date: '2026-01-25',
         items: [
             {
                 type: 'feature',
-                title: 'Sábados Letivos',
-                description: 'Agora você pode criar e gerenciar sábados letivos.',
+                title: 'Aba anotações',
+                description: 'Agora você pode criar e gerenciar notas.',
                 contributor: 'Lucas Willian',
                 contributorRole: 'Implementação'
             },

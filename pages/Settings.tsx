@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { useToast } from '../components/Toast';
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react';
 import { DAYS_OF_WEEK, PREDEFINED_GRADEBOOKS, MOCK_SPECIAL_DAYS, OFFICIAL_SATURDAY_CALENDAR } from '../constants';
 import { DBService } from '../services/db';
+// @ts-ignore
 import { useSearchParams } from 'react-router-dom';
 
 const SettingsGroup: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
@@ -67,8 +69,8 @@ export const Settings: React.FC = () => {
   const [selectedPresetCourse, setSelectedPresetCourse] = useState<string | null>(null);
 
   const [activeScheduleDay, setActiveScheduleDay] = useState(1);
-  const [newSlotStart, setNewSlotStart] = useState('07:30');
-  const [newSlotEnd, setNewSlotEnd] = useState('08:20');
+  const [newSlotStart, setNewSlotStart] = useState('07:00');
+  const [newSlotEnd, setNewSlotEnd] = useState('07:50');
   const [newSlotSubject, setNewSlotSubject] = useState('');
 
   const [newSpecialDate, setNewSpecialDate] = useState('');
@@ -79,7 +81,7 @@ export const Settings: React.FC = () => {
   const [importStage, setImportStage] = useState<'course' | 'year' | 'processing'>('course');
   const [importCourse, setImportCourse] = useState<string | null>(null);
 
-  const [serverUrl, setServerUrl] = useState('https://nao-tem-backup-ainda.sorry');
+  const [serverUrl, setServerUrl] = useState('https://vai-vir-daqui-a-pouco.sorry');
   const [isUploading, setIsUploading] = useState(false);
 
   const openSubjectModal = (subject?: Subject) => {
@@ -99,7 +101,7 @@ export const Settings: React.FC = () => {
       setIsSubjectModalOpen(true);
   };
 
-    useEffect(() => {
+  useEffect(() => {
       const action = searchParams.get('action');
       if (action === 'new_subject') {
           setActiveTab('subjects');
@@ -173,7 +175,7 @@ export const Settings: React.FC = () => {
                     totalClasses: t.totalClasses || 80,
                     type: t.type || SubjectType.NORMAL,
                     category: t.category || SubjectCategory.OTHER,
-                    teacher: t.teacher
+                    teacher: t.teacher 
                 });
             }
         });
@@ -206,7 +208,6 @@ export const Settings: React.FC = () => {
 
       const newSchedule = [...schedule, newSlot].sort((a,b) => a.startTime.localeCompare(b.startTime));
       updateSchedule(newSchedule);
-      const [endH, endM] = newSlotEnd.split(':').map(Number);
       addToast('Aula adicionada.', 'success');
   };
 
@@ -284,10 +285,10 @@ export const Settings: React.FC = () => {
                   
                   return {
                       id: Date.now().toString() + Math.random().toString(),
-                      dayOfWeek: 6,
+                      dayOfWeek: 6, 
                       startTime: s.start,
                       endTime: s.end,
-                      subjectId: matchedSub ? matchedSub.id : 'vago'
+                      subjectId: matchedSub ? matchedSub.id : 'vago' 
                   };
               });
 
@@ -302,7 +303,7 @@ export const Settings: React.FC = () => {
 
           addToast(`${addedCount} sábados letivos importados para ${settings.currentYear}!`, 'success');
           setIsImportModalOpen(false);
-      }, 1000);
+      }, 1000); 
   };
 
   const handleExport = async () => {
@@ -320,7 +321,7 @@ export const Settings: React.FC = () => {
 
   const handleCloudUpload = async () => {
       setIsUploading(true);
-      await new Promise(r => setTimeout(r, 1500));
+      await new Promise(r => setTimeout(r, 1500)); 
       setIsUploading(false);
       addToast('Sincronização concluída (Simulado)', 'success');
   };
@@ -352,7 +353,7 @@ export const Settings: React.FC = () => {
                   />
                   <SettingsItem 
                     icon={<GraduationCap size={20} />} 
-                    label="Geral" 
+                    label="Acadêmico" 
                     value="Notas e Ano" 
                     onClick={() => setActiveTab('academic')} 
                   />
@@ -383,7 +384,7 @@ export const Settings: React.FC = () => {
                   <SettingsItem 
                     icon={<Info size={20} />} 
                     label="Sobre" 
-                    value="v2.1.0" 
+                    value="v2.2.0" 
                     onClick={() => setActiveTab('about')} 
                   />
               </SettingsGroup>
@@ -430,7 +431,7 @@ export const Settings: React.FC = () => {
   if (activeTab === 'academic') {
       return (
           <div className="pb-20 max-w-2xl mx-auto animate-slide-in">
-              <SubPageHeader title="Configurações Gerais" />
+              <SubPageHeader title="Configurações Acadêmicas" />
               
               <SettingsGroup title="Ano Letivo">
                    <div className="p-4">
@@ -444,7 +445,7 @@ export const Settings: React.FC = () => {
                                <option key={y} value={y}>{y}</option>
                            ))}
                        </select>
-                       <p className="text-xs text-gray-400 mt-2">Alterar o ano mudará o banco de dados ativo. Seus dados de outros anos ficam salvos separadamente.</p>
+                       <p className="text-xs text-gray-400 mt-2">Alterar o ano mudará o banco de dados ativo. Suas notas de outros anos ficam salvas separadamente.</p>
                    </div>
                    <div className="p-4 pt-0">
                        <label className="block text-xs font-bold text-gray-500 mb-1.5">Total de Dias Letivos</label>
@@ -760,7 +761,7 @@ export const Settings: React.FC = () => {
                           className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2 mb-4"
                       >
                           <Book size={20} />
-                          Importar
+                          Assistente de Importação Oficial
                       </button>
 
                       <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
@@ -893,7 +894,7 @@ export const Settings: React.FC = () => {
   if (activeTab === 'backup') {
       return (
         <div className="pb-20 max-w-2xl mx-auto animate-slide-in">
-            <SubPageHeader title="Dados" />
+            <SubPageHeader title="Backup e Sincronização" />
             
             <SettingsGroup title="Backup Local (Arquivo)">
                 <div className="grid grid-cols-2 gap-4 p-4">
@@ -989,38 +990,38 @@ export const Settings: React.FC = () => {
             </SettingsGroup>
 
             <SettingsGroup title="Conecte-se">
-                  <a href="https://github.com/lucas-willian" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+                  <a href="https://forumcefet.site" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 group-hover:bg-black group-hover:text-white transition-colors">
-                              <Github size={20} />
+                              <Globe size={20} />
                           </div>
-                          <span className="font-medium text-gray-700 dark:text-gray-200">GitHub</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-200">Fórum</span>
                       </div>
                       <ChevronRight size={16} className="text-gray-400" />
                   </a>
-                  <a href="https://linkedin.com/in/lucas-willian" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+                  <a href="https://microspace.site" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                              <Linkedin size={20} />
+                              <Globe size={20} />
                           </div>
-                          <span className="font-medium text-gray-700 dark:text-gray-200">LinkedIn</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-200">Microspace</span>
                       </div>
                       <ChevronRight size={16} className="text-gray-400" />
                   </a>
-                  <a href="https://lucaswillian.dev" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
+                  <a href="#" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group">
                       <div className="flex items-center gap-3">
                           <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                               <Globe size={20} />
                           </div>
-                          <span className="font-medium text-gray-700 dark:text-gray-200">Portfolio</span>
+                          <span className="font-medium text-gray-700 dark:text-gray-200">...</span>
                       </div>
                       <ChevronRight size={16} className="text-gray-400" />
                   </a>
             </SettingsGroup>
 
             <div className="text-center pt-8 pb-4">
-                <p className="text-xs text-gray-400 font-medium">Versão 2.1.0</p>
-                <p className="text-[10px] text-gray-300 dark:text-gray-600 mt-1">© {new Date().getFullYear()}</p>
+                <p className="text-xs text-gray-400 font-medium">Versão 2.2.0</p>
+                <p className="text-[10px] text-gray-300 dark:text-gray-600 mt-1">© {new Date().getFullYear()} Lucas Willian</p>
             </div>
         </div>
       )

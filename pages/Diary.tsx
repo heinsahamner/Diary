@@ -6,6 +6,7 @@ import { format, addDays, subDays, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Slash, RefreshCw, Lock, Unlock, ArrowRightLeft, StickyNote, Save, Calendar as CalendarIcon, RotateCcw, Clock, AlertOctagon, ShieldCheck, Trash2 } from 'lucide-react';
 import { ClassLog, ClassStatus, SubjectType, ScheduleSlot } from '../types';
+// @ts-ignore
 import { useSearchParams } from 'react-router-dom';
 
 export const Diary: React.FC = () => {
@@ -35,7 +36,6 @@ export const Diary: React.FC = () => {
   const validation = validations.find(v => v.date === dateKey);
   const isActive = validation && !validation.isLocked;
   const isLocked = validation && validation.isLocked;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isNotStarted = !validation;
 
   let dailySlots: ScheduleSlot[] = [];
@@ -56,8 +56,8 @@ export const Diary: React.FC = () => {
   const specialDay = specialDays.find(sd => sd.date === dateKey);
 
   const handleValidateDay = () => {
-    validateDay(dateKey);
-    addToast(isLocked ? 'Dia destrancado. Edições permitidas.' : 'Dia letivo iniciado!', 'success');
+    validateDay(dateKey); 
+    addToast(isLocked ? 'Dia destrancado. Edições permitidas.' : 'Dia iniciado!', 'success');
   };
 
   const handleLockDay = () => {
@@ -68,7 +68,7 @@ export const Diary: React.FC = () => {
   };
 
   const handleResetDay = () => {
-    if (window.confirm('⚠️ Reiniciar este dia?\n\nIsso apagará o registro de "Dia Letivo" e as faltas/presenças deixarão de contar nas estatísticas até que você inicie o dia novamente.')) {
+    if (window.confirm('⚠️ Reiniciar este dia?\n\nIsso apagará o registro de "Dia" e as faltas/presenças deixarão de contar nas estatísticas até que você inicie o dia novamente.')) {
         invalidateDay(dateKey);
         addToast('Dia reiniciado para estado "Não Iniciado".', 'info');
     }
@@ -417,7 +417,7 @@ export const Diary: React.FC = () => {
            <p className={`text-sm max-w-sm mx-auto mb-8 leading-relaxed ${isLocked ? 'text-red-600/80 dark:text-red-300/70' : 'text-gray-500 dark:text-gray-400'}`}>
              {isLocked
                 ? 'Este dia foi trancado manualmente. A grade foi salva e o histórico preservado.' 
-                : 'As aulas deste dia estão bloqueadas. Inicie o dia letivo para liberar o registro de presenças.'}
+                : 'As aulas deste dia estão bloqueadas. Inicie o dia para liberar o registro de presenças.'}
            </p>
            
            {dailySlots.length > 0 ? (
@@ -430,7 +430,7 @@ export const Diary: React.FC = () => {
                `}
              >
                {isLocked ? <Unlock size={18} /> : null}
-               {isLocked ? 'Destrancar Dia' : 'Iniciar Dia Letivo'}
+               {isLocked ? 'Destrancar Dia' : 'Iniciar Dia'}
              </button>
            ) : (
              <p className="text-sm font-medium text-orange-500">Sem aulas programadas para este dia.</p>

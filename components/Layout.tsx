@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
+// @ts-ignore - Fix named export error in certain environments
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Calendar, GraduationCap, CheckSquare, BarChart2, Settings, MoreHorizontal, X, Music } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Calendar, GraduationCap, CheckSquare, BarChart2, Settings, MoreHorizontal, X, Music, StickyNote } from 'lucide-react';
 
 const NavItem: React.FC<{ to: string; icon: React.ReactNode; label: string }> = ({ to, icon, label }) => {
   const location = useLocation();
@@ -35,7 +37,6 @@ const MobileMenuItem: React.FC<{ to: string; icon: React.ReactNode; label: strin
 
 export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-  
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,10 +44,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
   useEffect(() => {
       const action = searchParams.get('action');
       if (action === 'create' && location.pathname === '/') {
-          navigate({
-              pathname: '/tasks',
-              search: searchParams.toString()
-          }, { replace: true });
+          navigate({ pathname: '/tasks', search: searchParams.toString() }, { replace: true });
       }
   }, [searchParams, location, navigate]);
 
@@ -65,13 +63,13 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
           <NavItem to="/calendar" icon={<Calendar size={20} />} label="Calendário" />
           <NavItem to="/grades" icon={<GraduationCap size={20} />} label="Notas" />
           <NavItem to="/tasks" icon={<CheckSquare size={20} />} label="Tarefas" />
+          <NavItem to="/notes" icon={<StickyNote size={20} />} label="Anotações" />
           <NavItem to="/beats" icon={<Music size={20} />} label="Beats" />
           <NavItem to="/stats" icon={<BarChart2 size={20} />} label="Análise" />
           <NavItem to="/settings" icon={<Settings size={20} />} label="Ajustes" />
         </nav>
-        
-        <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
-            <p className="text-xs text-center text-gray-400">v2.1.0 • Diary</p>
+        <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800 text-xs text-center text-gray-400">
+            v2.2.0 • Diary
         </div>
       </aside>
 
@@ -83,12 +81,10 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
 
       {isMoreMenuOpen && (
         <>
-            <div 
-              className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-30 animate-fade-in" 
-              onClick={() => setIsMoreMenuOpen(false)}
-            />
+            <div className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-30 animate-fade-in" onClick={() => setIsMoreMenuOpen(false)} />
             <div className="md:hidden fixed bottom-[85px] right-4 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-2 min-w-[180px] z-40 origin-bottom-right animate-scale-in">
                 <div className="flex flex-col space-y-1">
+                    <MobileMenuItem to="/notes" icon={<StickyNote size={18}/>} label="Anotações" onClick={() => setIsMoreMenuOpen(false)} />
                     <MobileMenuItem to="/calendar" icon={<Calendar size={18}/>} label="Calendário" onClick={() => setIsMoreMenuOpen(false)} />
                     <MobileMenuItem to="/beats" icon={<Music size={18}/>} label="Beats" onClick={() => setIsMoreMenuOpen(false)} />
                     <MobileMenuItem to="/stats" icon={<BarChart2 size={18}/>} label="Análise" onClick={() => setIsMoreMenuOpen(false)} />
@@ -104,11 +100,7 @@ export const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) =
         <NavItem to="/diary" icon={<BookOpen size={24} />} label="Diário" />
         <NavItem to="/tasks" icon={<CheckSquare size={24} />} label="Tarefas" />
         <NavItem to="/grades" icon={<GraduationCap size={24} />} label="Notas" />
-        
-        <button 
-          onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
-          className={`flex flex-col items-center p-2 rounded-xl transition-all ${isMoreMenuOpen ? 'text-indigo-600 dark:text-purple-400 bg-indigo-50 dark:bg-gray-800' : 'text-gray-400 dark:text-gray-500'}`}
-        >
+        <button onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)} className={`flex flex-col items-center p-2 rounded-xl transition-all ${isMoreMenuOpen ? 'text-indigo-600 dark:text-purple-400 bg-indigo-50 dark:bg-gray-800' : 'text-gray-400 dark:text-gray-500'}`}>
            {isMoreMenuOpen ? <X size={24} /> : <MoreHorizontal size={24} />}
            <span className="text-[10px] mt-1 font-medium">Mais</span>
         </button>

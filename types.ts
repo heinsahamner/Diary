@@ -1,7 +1,7 @@
 
 export enum SubjectType {
-  NORMAL = 'Normal',
-  ORGANIZATIONAL = 'Organizational',
+  NORMAL = 'Normal', 
+  ORGANIZATIONAL = 'Organizational', 
   EXTENSION = 'Extension',
 }
 
@@ -17,7 +17,7 @@ export enum SubjectCategory {
 export enum ClassStatus {
   PRESENT = 'Present',
   ABSENT = 'Absent',
-  CANCELED = 'Canceled',
+  CANCELED = 'Canceled', 
   SUBSTITUTED = 'Substituted',
 }
 
@@ -66,16 +66,16 @@ export interface SpecialDay {
 export interface ClassLog {
   id: string;
   date: string;
-  slotId: string; 
+  slotId: string;
   originalSubjectId: string;
-  actualSubjectId: string; 
+  actualSubjectId: string;
   status: ClassStatus;
-  note?: string; 
+  note?: string;
 }
 
 export interface DayValidation {
-  date: string; 
-  isValidated: boolean; 
+  date: string;
+  isValidated: boolean;
   isLocked?: boolean;
   archivedSchedule?: ScheduleSlot[];
 }
@@ -88,7 +88,7 @@ export interface Assessment {
   value: number;
   weight: number;
   date: string;
-  isExtra?: boolean; 
+  isExtra?: boolean;
 }
 
 export interface Subtask {
@@ -107,9 +107,18 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   members?: string;
-  description?: string; 
-  subtasks?: Subtask[]; 
-  timeSpent?: number; 
+  description?: string;
+  subtasks?: Subtask[];
+  timeSpent?: number;
+}
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  color: string;
+  lastModified: string;
+  isPinned: boolean;
 }
 
 export type GradeCalcMethod = 'running' | 'absolute';
@@ -120,20 +129,21 @@ export interface SystemSettings {
   darkMode: boolean;
   compactMode: boolean;
   notificationsEnabled: boolean;
-  passingGrade: number; 
-  gradeCalcMethod: GradeCalcMethod; 
-  gradingSystem: GradingSystem; 
+  passingGrade: number;
+  gradeCalcMethod: GradeCalcMethod;
+  gradingSystem: GradingSystem;
   currentYear: number;
 }
 
 export interface AppState {
   subjects: Subject[];
   schedule: ScheduleSlot[];
-  specialDays: SpecialDay[]; 
+  specialDays: SpecialDay[];
   logs: ClassLog[];
   validations: DayValidation[];
   assessments: Assessment[];
   tasks: Task[];
+  notes: Note[];
   settings: SystemSettings;
 }
 
@@ -155,6 +165,9 @@ export interface AppContextType extends AppState {
   addTask: (t: Task) => void;
   updateTask: (t: Task) => void;
   deleteTask: (id: string) => void;
+  addNote: (n: Note) => void;
+  updateNote: (n: Note) => void;
+  deleteNote: (id: string) => void;
   updateSettings: (s: SystemSettings) => void;
   importData: (data: AppState) => void;
   resetData: () => void;

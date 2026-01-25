@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, SystemSettings, SubjectType, SubjectCategory, SpecialDay } from '../types';
+import { AppState, AppContextType, Subject, ScheduleSlot, ClassLog, DayValidation, Assessment, Task, Note, SystemSettings, SubjectType, SubjectCategory, SpecialDay } from '../types';
 import { DBService } from './db';
 import { Loader2 } from 'lucide-react';
 
@@ -8,22 +8,8 @@ const StoreContext = createContext<AppContextType | undefined>(undefined);
 
 const cleanState: AppState = {
   subjects: [
-    { 
-        id: 'reposicao', 
-        name: 'Reposição', 
-        color: '#8b5cf6', 
-        totalClasses: 0, 
-        type: SubjectType.ORGANIZATIONAL, 
-        category: SubjectCategory.OTHER 
-    },
-    { 
-        id: 'vago', 
-        name: 'Horário Vago', 
-        color: '#9ca3af',
-        totalClasses: 0, 
-        type: SubjectType.ORGANIZATIONAL, 
-        category: SubjectCategory.OTHER 
-    }
+    { id: 'reposicao', name: 'Reposição', color: '#8b5cf6', totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER },
+    { id: 'vago', name: 'Horário Vago', color: '#9ca3af', totalClasses: 0, type: SubjectType.ORGANIZATIONAL, category: SubjectCategory.OTHER }
   ],
   schedule: [],
   specialDays: [],
@@ -31,6 +17,7 @@ const cleanState: AppState = {
   validations: [],
   assessments: [],
   tasks: [],
+  notes: [],
   settings: {
     totalSchoolDays: 200,
     darkMode: false,
@@ -68,19 +55,15 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
             const data = await DBService.loadState(user, activeYear);
             if (data) {
                 const mergedSubjects = [...data.subjects];
-                
-                if (!mergedSubjects.find(s => s.id === 'reposicao')) {
-                    mergedSubjects.push(cleanState.subjects[0]);
-                }
-                if (!mergedSubjects.find(s => s.id === 'vago')) {
-                    mergedSubjects.push(cleanState.subjects[1]);
-                }
+                if (!mergedSubjects.find(s => s.id === 'reposicao')) mergedSubjects.push(cleanState.subjects[0]);
+                if (!mergedSubjects.find(s => s.id === 'vago')) mergedSubjects.push(cleanState.subjects[1]);
 
                 setState({
                     ...cleanState,
                     ...data,
                     subjects: mergedSubjects,
                     specialDays: data.specialDays || [],
+                    notes: data.notes || [],
                     settings: { ...cleanState.settings, ...(data.settings || {}), currentYear: activeYear }
                 });
             } else {
@@ -99,86 +82,39 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
   useEffect(() => {
     if (!isLoaded.current || loading) return;
-
-    if (state.settings.currentYear === activeYear) {
-        DBService.saveState(user, activeYear, state).catch(err => 
-            console.error("Failed to auto-save to DB", err)
-        );
-    }
+    DBService.saveState(user, activeYear, state).catch(err => console.error("Failed to auto-save", err));
   }, [state, user, activeYear, loading]);
 
   useEffect(() => {
-    if (state.settings.darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    if (state.settings.darkMode) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
   }, [state.settings.darkMode]);
 
   const addSubject = (subject: Subject) => setState(prev => ({ ...prev, subjects: [...prev.subjects, subject] }));
-  
-  const updateSubject = (subject: Subject) => setState(prev => ({
-      ...prev,
-      subjects: prev.subjects.map(s => s.id === subject.id ? subject : s)
-  }));
-
-  const removeSubject = (id: string) => setState(prev => ({
-      ...prev,
-      subjects: prev.subjects.filter(s => s.id !== id),
-      schedule: prev.schedule.filter(s => s.subjectId !== id)
-  }));
-
+  const updateSubject = (subject: Subject) => setState(prev => ({ ...prev, subjects: prev.subjects.map(s => s.id === subject.id ? subject : s) }));
+  const removeSubject = (id: string) => setState(prev => ({ ...prev, subjects: prev.subjects.filter(s => s.id !== id), schedule: prev.schedule.filter(s => s.subjectId !== id) }));
   const updateSchedule = (slots: ScheduleSlot[]) => setState(prev => ({ ...prev, schedule: slots }));
-
   const addSpecialDay = (day: SpecialDay) => setState(prev => ({ ...prev, specialDays: [...prev.specialDays.filter(d => d.date !== day.date), day] }));
   const removeSpecialDay = (date: string) => setState(prev => ({ ...prev, specialDays: prev.specialDays.filter(d => d.date !== date) }));
 
   const validateDay = (date: string) => setState(prev => {
       const existing = prev.validations.find(v => v.date === date);
-      
       const special = prev.specialDays.find(s => s.date === date);
       let snapshot: ScheduleSlot[] = [];
-      
-      if (special) {
-          snapshot = special.customSlots;
-      } else {
+      if (special) snapshot = special.customSlots;
+      else {
           const [y, m, d] = date.split('-').map(Number);
-          const dateObj = new Date(y, m - 1, d);
-          const dow = dateObj.getDay();
+          const dow = new Date(y, m - 1, d).getDay();
           snapshot = prev.schedule.filter(s => s.dayOfWeek === dow);
       }
-
       if (existing) {
-          return {
-              ...prev,
-              validations: prev.validations.map(v => v.date === date ? { 
-                  ...v, 
-                  isLocked: false,
-                  archivedSchedule: v.archivedSchedule || snapshot 
-              } : v)
-          };
+          return { ...prev, validations: prev.validations.map(v => v.date === date ? { ...v, isLocked: false, archivedSchedule: v.archivedSchedule || snapshot } : v) };
       }
-      
-      return { 
-          ...prev, 
-          validations: [...prev.validations, { 
-              date, 
-              isValidated: true, 
-              isLocked: false,
-              archivedSchedule: snapshot
-          }] 
-      };
+      return { ...prev, validations: [...prev.validations, { date, isValidated: true, isLocked: false, archivedSchedule: snapshot }] };
   });
 
-  const lockDay = (date: string) => setState(prev => ({
-      ...prev,
-      validations: prev.validations.map(v => v.date === date ? { ...v, isLocked: true } : v)
-  }));
-
-  const invalidateDay = (date: string) => setState(prev => ({
-      ...prev,
-      validations: prev.validations.filter(v => v.date !== date)
-  }));
+  const lockDay = (date: string) => setState(prev => ({ ...prev, validations: prev.validations.map(v => v.date === date ? { ...v, isLocked: true } : v) }));
+  const invalidateDay = (date: string) => setState(prev => ({ ...prev, validations: prev.validations.filter(v => v.date !== date) }));
 
   const logClass = (log: ClassLog) => setState(prev => {
       const existingIndex = prev.logs.findIndex(l => l.date === log.date && l.slotId === log.slotId);
@@ -189,22 +125,16 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
   });
 
   const addAssessment = (assessment: Assessment) => setState(prev => ({ ...prev, assessments: [...prev.assessments, assessment] }));
-
   const removeAssessment = (id: string) => setState(prev => ({ ...prev, assessments: prev.assessments.filter(a => a.id !== id) }));
-
-  const updateAssessment = (assessment: Assessment) => setState(prev => ({
-      ...prev,
-      assessments: prev.assessments.map(a => a.id === assessment.id ? assessment : a)
-  }));
+  const updateAssessment = (assessment: Assessment) => setState(prev => ({ ...prev, assessments: prev.assessments.map(a => a.id === assessment.id ? assessment : a) }));
 
   const addTask = (task: Task) => setState(prev => ({ ...prev, tasks: [...prev.tasks, task] }));
-
-  const updateTask = (task: Task) => setState(prev => ({
-      ...prev,
-      tasks: prev.tasks.map(t => t.id === task.id ? task : t)
-  }));
-
+  const updateTask = (task: Task) => setState(prev => ({ ...prev, tasks: prev.tasks.map(t => t.id === task.id ? task : t) }));
   const deleteTask = (id: string) => setState(prev => ({ ...prev, tasks: prev.tasks.filter(t => t.id !== id) }));
+
+  const addNote = (note: Note) => setState(prev => ({ ...prev, notes: [note, ...prev.notes] }));
+  const updateNote = (note: Note) => setState(prev => ({ ...prev, notes: prev.notes.map(n => n.id === note.id ? note : n) }));
+  const deleteNote = (id: string) => setState(prev => ({ ...prev, notes: prev.notes.filter(n => n.id !== id) }));
 
   const updateSettings = (settings: SystemSettings) => {
       if (settings.currentYear !== activeYear) {
@@ -234,26 +164,11 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
     <StoreContext.Provider value={{
       ...state,
       currentUser: user,
-      addSubject,
-      updateSubject,
-      removeSubject,
-      updateSchedule,
-      addSpecialDay,
-      removeSpecialDay,
-      validateDay,
-      lockDay,
-      invalidateDay,
-      logClass,
-      addAssessment,
-      removeAssessment,
-      updateAssessment,
-      addTask,
-      updateTask,
-      deleteTask,
-      updateSettings,
-      importData,
-      resetData,
-      logout: onLogout
+      addSubject, updateSubject, removeSubject, updateSchedule,
+      addSpecialDay, removeSpecialDay, validateDay, lockDay, invalidateDay,
+      logClass, addAssessment, removeAssessment, updateAssessment,
+      addTask, updateTask, deleteTask, addNote, updateNote, deleteNote,
+      updateSettings, importData, resetData, logout: onLogout
     }}>
       {children}
     </StoreContext.Provider>
@@ -262,8 +177,6 @@ export const StoreProvider: React.FC<StoreProviderProps> = ({ children, user, on
 
 export const useStore = () => {
   const context = useContext(StoreContext);
-  if (!context) {
-    throw new Error('useStore must be used within a StoreProvider');
-  }
+  if (!context) throw new Error('useStore must be used within a StoreProvider');
   return context;
 };

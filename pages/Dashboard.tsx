@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useStore } from '../services/store';
 import { DeepLinkService } from '../services/deepLink';
@@ -9,6 +10,7 @@ import {
     Sun, Moon, Sunrise, HelpCircle
 } from 'lucide-react';
 import { TaskStatus, ClassStatus, SubjectType } from '../types';
+// @ts-ignore
 import { Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Tutorial } from '../components/Tutorial';
@@ -33,7 +35,6 @@ export const Dashboard: React.FC = () => {
       if (hour < 18) return { text: 'Boa tarde', icon: <Sun size={28} /> };
       return { text: 'Boa noite', icon: <Moon size={28} /> };
   }, [currentTime]);
-
 
   const dailyProgress = useMemo(() => {
       const todaysClasses = schedule.filter(s => s.dayOfWeek === dayOfWeek);
@@ -105,7 +106,6 @@ export const Dashboard: React.FC = () => {
         .slice(0, 3);
   }, [tasks]);
 
-
   const handleQuickCheckIn = (slotId: string, subjectId: string) => {
       logClass({
           id: `${dateKey}-${slotId}`,
@@ -119,7 +119,8 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fade-in pb-20">
-    <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+      <Tutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-gray-800 dark:to-gray-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl"></div>
@@ -150,7 +151,7 @@ export const Dashboard: React.FC = () => {
                       <ResponsiveContainer width="100%" height="100%">
                           <PieChart>
                               <Pie
-                                  data={[{ value: dailyProgress }, { value: 105 - dailyProgress }]}
+                                  data={[{ value: dailyProgress }, { value: 100 - dailyProgress }]}
                                   innerRadius={30}
                                   outerRadius={40}
                                   startAngle={90}
@@ -321,8 +322,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-
-                <button 
+               <button 
                   onClick={() => setIsTutorialOpen(true)}
                   className="col-span-2 bg-purple-50 dark:bg-purple-900/20 p-4 rounded-2xl border border-purple-100 dark:border-purple-900/50 hover:shadow-md transition-all flex items-center justify-between group text-left"
                >

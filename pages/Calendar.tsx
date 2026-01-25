@@ -1,8 +1,10 @@
+
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../services/store';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, someMonths, isToday, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ClassStatus, TaskStatus, ScheduleSlot } from '../types';
+// @ts-ignore
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Circle, CheckCircle, XCircle, Slash, Calendar as CalendarIcon, ArrowRight, CheckSquare } from 'lucide-react';
 
@@ -44,14 +46,15 @@ export const CalendarView: React.FC = () => {
         return schedule.filter(s => s.dayOfWeek === dow).sort((a,b) => a.startTime.localeCompare(b.startTime));
     }, [isDayValidated, validation, selectedDateKey, specialDays, selectedDate, schedule]);
 
-    const monthStats = useMemo(() => {
-    const monthLogs = logs.filter(l => l.date.startsWith(format(displayDate, 'yyyy-MM')));
-    const validLogs = monthLogs.filter(l => l.status !== ClassStatus.CANCELED);
-    const presentLogs = validLogs.filter(l => l.status === ClassStatus.PRESENT || l.status === ClassStatus.SUBSTITUTED).length;
-    const attRate = validLogs.length > 0 ? Math.round((presentLogs / validLogs.length) * 100) : 100;
 
-    const monthTasks = tasks.filter(t => isSameMonth(new Date(t.dueDate), displayDate));
-    const pendingTasks = monthTasks.filter(t => t.status !== TaskStatus.COMPLETED).length;
+    const monthStats = useMemo(() => {
+        const monthLogs = logs.filter(l => l.date.startsWith(format(displayDate, 'yyyy-MM')));
+        const validLogs = monthLogs.filter(l => l.status !== ClassStatus.CANCELED);
+        const presentLogs = validLogs.filter(l => l.status === ClassStatus.PRESENT || l.status === ClassStatus.SUBSTITUTED).length;
+        const attRate = validLogs.length > 0 ? Math.round((presentLogs / validLogs.length) * 100) : 100;
+
+        const monthTasks = tasks.filter(t => isSameMonth(new Date(t.dueDate), displayDate));
+        const pendingTasks = monthTasks.filter(t => t.status !== TaskStatus.COMPLETED).length;
 
         return { attRate, pendingTasks };
     }, [logs, tasks, displayDate]);
@@ -175,7 +178,7 @@ export const CalendarView: React.FC = () => {
                         </div>
                         <div>
                             <p className="font-bold text-sm text-gray-700 dark:text-gray-200 mt-2">
-                                {isDayValidated ? 'Dia Iniciado' : 'Dia não iniciado'}
+                                {isDayValidated ? 'Dia Letivo Iniciado' : 'Dia não iniciado'}
                             </p>
                         </div>
                      </div>

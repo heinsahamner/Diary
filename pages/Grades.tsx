@@ -1,9 +1,11 @@
+
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../services/store';
 import { TRIMESTERS } from '../constants';
 import { Plus, Trash2, Calculator, Star, TrendingUp, GraduationCap, AlertTriangle, BookOpen, Target, X, LayoutGrid, List, Pencil, ChevronRight, ArrowLeft, LayoutTemplate } from 'lucide-react';
 import { Assessment, SubjectType, GradingSystem, Subject, ClassStatus } from '../types';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+// @ts-ignore
 import { useNavigate } from 'react-router-dom';
 
 const calculateSubjectAverage = (assessments: Assessment[], subject: Subject | undefined, trimester: number | null, method: 'running' | 'absolute', globalGradingSystem: GradingSystem) => {
@@ -75,7 +77,6 @@ export const Grades: React.FC = () => {
       return subjects
         .filter(s => s.type === SubjectType.NORMAL)
         .map(sub => {
-
             const t1 = calculateSubjectAverage(assessments, sub, 1, settings.gradeCalcMethod, settings.gradingSystem || 'average');
             const t2 = calculateSubjectAverage(assessments, sub, 2, settings.gradeCalcMethod, settings.gradingSystem || 'average');
             const t3 = calculateSubjectAverage(assessments, sub, 3, settings.gradeCalcMethod, settings.gradingSystem || 'average');
